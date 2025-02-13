@@ -747,14 +747,14 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3162082765675257300, guid: 87e29f7f64ee37e43a2973a0622e00e1, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 856938432}
+      addedObject: {fileID: 856938430}
   m_SourcePrefab: {fileID: 100100000, guid: 87e29f7f64ee37e43a2973a0622e00e1, type: 3}
 --- !u!1 &856938429 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3162082765675257300, guid: 87e29f7f64ee37e43a2973a0622e00e1, type: 3}
   m_PrefabInstance: {fileID: 856938428}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &856938432
+--- !u!114 &856938430
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -766,19 +766,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45e19473fe0ecc4439eba92c848f58a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WPawn: {fileID: 0}
-  WBishop: {fileID: 0}
-  WKnight: {fileID: 0}
-  WRook: {fileID: 0}
-  WQueen: {fileID: 0}
-  WKing: {fileID: 0}
-  BPawn: {fileID: 0}
-  BBishop: {fileID: 0}
-  BKnight: {fileID: 0}
-  BRook: {fileID: 0}
-  BQueen: {fileID: 0}
-  BKing: {fileID: 0}
-  startPosition: 
+  Bitboards: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
