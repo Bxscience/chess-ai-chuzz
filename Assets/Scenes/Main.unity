@@ -206,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
-  m_LocalPosition: {x: 4.46, y: 8.5, z: 4.46}
+  m_LocalPosition: {x: 5.46, y: 8.5, z: 5.46}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -348,7 +348,7 @@ Transform:
   m_GameObject: {fileID: 410087039}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 4.46, y: 10, z: 4.46}
+  m_LocalPosition: {x: 5.46, y: 10, z: 5.46}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -747,14 +747,14 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3162082765675257300, guid: 87e29f7f64ee37e43a2973a0622e00e1, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 856938430}
+      addedObject: {fileID: 856938432}
   m_SourcePrefab: {fileID: 100100000, guid: 87e29f7f64ee37e43a2973a0622e00e1, type: 3}
 --- !u!1 &856938429 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3162082765675257300, guid: 87e29f7f64ee37e43a2973a0622e00e1, type: 3}
   m_PrefabInstance: {fileID: 856938428}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &856938430
+--- !u!114 &856938432
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -763,9 +763,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 856938429}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e87d025abab7c434e8177cd34db982a9, type: 3}
+  m_Script: {fileID: 11500000, guid: 45e19473fe0ecc4439eba92c848f58a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WPawn: {fileID: 0}
+  WBishop: {fileID: 0}
+  WKnight: {fileID: 0}
+  WRook: {fileID: 0}
+  WQueen: {fileID: 0}
+  WKing: {fileID: 0}
+  BPawn: {fileID: 0}
+  BBishop: {fileID: 0}
+  BKnight: {fileID: 0}
+  BRook: {fileID: 0}
+  BQueen: {fileID: 0}
+  BKing: {fileID: 0}
+  startPosition: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
