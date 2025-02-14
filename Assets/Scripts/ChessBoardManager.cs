@@ -5,4 +5,8 @@ public class ChessBoardManager : MonoBehaviour{
     void Start(){
         Chessboard = new Board();
     }
+
+    public void DisplayBitboards(){
+        
+    }
 }

@@ -8,14 +8,19 @@ public enum Piece{
 public struct Board{
     public const int BitboardCount = 12;
     private string _FENPosition;
+    public bool Iswhiteturn;
     public ulong[] Bitboards;
+    public uloug Wpieces, Bpieces;
 
     public Board(string FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"){
+        IsWhiteTurn = true;
         Bitboards = new ulong[BitboardCount];
         for (int i = 0; i < BitboardCount; i++)
             Bitboards[i] = ulong.MinValue;
         _FENPosition = FEN;
         ParseFENString();
+        Wpieces = Bitboards[Piece.WPawn] | Bitboards[Piece.WBishop] | Bitboards[Piece.WKnight] | Bitboards[Piece.WRook] | Bitboards[Piece.WQueen] | Bitboards[Piece.WKing];
+        Bpieces = Bitboards[Piece.BPawn] | Bitboards[Piece.BBishop] | Bitboards[Piece.BKnight] | Bitboards[Piece.BRook] | Bitboards[Piece.BQueen] | Bitboards[Piece.BKing];
     }
 
     private Piece ValueSwitch(char c) => c switch{
@@ -47,4 +52,5 @@ public struct Board{
                 index -= (int)Char.GetNumericValue(letter);
         }
     }
+
 }
