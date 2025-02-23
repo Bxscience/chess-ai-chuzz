@@ -1,28 +1,35 @@
 using System;
 
-public enum Piece{
-    WPawn = 0, WBishop = 1, WKnight = 2, WRook = 3, WQueen = 4, WKing = 5,
-    BPawn = 6, BBishop = 7, BKnight = 8, BRook = 9, BQueen = 10, BKing = 11
-}
-
-public struct Board{
+public class Board{
+    private const string _DefaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
     public const int BitboardCount = 12;
-    private string _FENPosition;
+    public const int BoardSize = 8;
+    private readonly string _FENPosition;
     public bool Iswhiteturn;
     public ulong[] Bitboards;
-    public uloug Wpieces, Bpieces;
+    public ulong Wpieces, Bpieces;
+    public AttackTables Attacks;
 
-    public Board(string FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"){
-        IsWhiteTurn = true;
+    public Board(string FEN){
+        Iswhiteturn = true;
         Bitboards = new ulong[BitboardCount];
         for (int i = 0; i < BitboardCount; i++)
             Bitboards[i] = ulong.MinValue;
-        _FENPosition = FEN;
+        Wpieces = Bpieces = 0ul;
+        _FENPosition = FEN == "" ? _DefaultPosition : FEN;
+        Attacks = new AttackTables(this);
         ParseFENString();
-        Wpieces = Bitboards[Piece.WPawn] | Bitboards[Piece.WBishop] | Bitboards[Piece.WKnight] | Bitboards[Piece.WRook] | Bitboards[Piece.WQueen] | Bitboards[Piece.WKing];
-        Bpieces = Bitboards[Piece.BPawn] | Bitboards[Piece.BBishop] | Bitboards[Piece.BKnight] | Bitboards[Piece.BRook] | Bitboards[Piece.BQueen] | Bitboards[Piece.BKing];
+        Wpieces = Bitboards[(int)Piece.WPawn] | Bitboards[(int)Piece.WBishop] | Bitboards[(int)Piece.WKnight] | 
+                    Bitboards[(int)Piece.WRook] | Bitboards[(int)Piece.WQueen] | Bitboards[(int)Piece.WKing];
+        Bpieces = Bitboards[(int)Piece.BPawn] | Bitboards[(int)Piece.BBishop] | Bitboards[(int)Piece.BKnight] | 
+                    Bitboards[(int)Piece.BRook] | Bitboards[(int)Piece.BQueen] | Bitboards[(int)Piece.BKing];
     }
 
+    public void TestBoard(){
+        Helper.PrintBitboard(AttackTables.MaskPawnAttacks(7));
+    }
+
+    // Represents all values in FEN String as Piece Enums for easy transversal
     private Piece ValueSwitch(char c) => c switch{
         'P' => Piece.WPawn,
         'B' => Piece.WBishop,
@@ -40,17 +47,17 @@ public struct Board{
         _ => throw new Exception("Invalid FEN string!")
     };
 
+    // Parses the FEN String and updates revelant bitboards with pieces
     private void ParseFENString(){
         int index = 63;
         for(int i = 0; i < _FENPosition.Length; i++){
             char letter = _FENPosition[i];
             if(char.IsLetter(letter)){
-                Bitboards[(int)ValueSwitch(letter)] |= 1ul << index;
+                Helper.SetBit(ref Bitboards[(int)ValueSwitch(letter)], index);
                 index--;
             }
             else if (char.IsDigit(letter))
                 index -= (int)Char.GetNumericValue(letter);
         }
     }
-
 }
