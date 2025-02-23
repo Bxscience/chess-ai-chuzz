@@ -3,6 +3,14 @@ public enum Piece{
     BPawn = 6, BBishop = 7, BKnight = 8, BRook = 9, BQueen = 10, BKing = 11
 }
 
+public enum Color{
+    Black = 0, White = 1
+}
+
+public enum Square{
+    //WIP
+}
+
 public struct Helper{
 //======================================== Bit Manipulation ========================================//
     // Returns the bit (in int type) in a bitboard of an index
