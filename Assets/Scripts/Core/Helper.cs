@@ -1,3 +1,5 @@
+using Unity.Burst.Intrinsics;
+
 public enum Piece{
     WPawn = 0, WBishop = 1, WKnight = 2, WRook = 3, WQueen = 4, WKing = 5,
     BPawn = 6, BBishop = 7, BKnight = 8, BRook = 9, BQueen = 10, BKing = 11
@@ -46,14 +48,39 @@ public struct Helper{
         return count;
     }
 
-    // (WIP, need to make sure if its MSB or LSB)
-    public static int MSBIndex(ulong Bitboard){
-        if (Bitboard != 0ul){
-            return CountBit((Bitboard & ~Bitboard + 1) - 1);
+    // Gets the index of the LSB in a bitboard (includes the LSB)
+    public static int LSBIndex(ulong Bitboard){
+        ulong count;
+        if (CheckBit(Bitboard, 1ul, 0))
+            count = 0;
+        else{
+            count = 1;
+            if ((Bitboard & 0xffffffff) == 0){
+                Bitboard >>= 32;
+                count += 32;
+            }
+            if ((Bitboard & 0xffff) == 0){
+                Bitboard >>= 16;
+                count += 16;
+            }
+            if ((Bitboard & 0xff) == 0){
+                Bitboard >>= 8;
+                count += 8;
+            }
+            if ((Bitboard & 0xf) == 0){
+                Bitboard >>= 4;
+                count += 4;
+            }
+            if ((Bitboard & 0x3) == 0){
+                Bitboard >>= 2;
+                count += 2;
+            }
+            count -= Bitboard & 0x1;
         }
-        else
-            return -1;
+        return (int)count + 1;
     }
+
+    //public static ulong GetRandomUlong(){}
 
 //======================================== Output ========================================//
     // Prints out the bitboard in a human-friendly way
