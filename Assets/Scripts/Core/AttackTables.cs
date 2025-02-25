@@ -1,5 +1,3 @@
-using UnityEngine.UIElements.Experimental;
-
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
     private const ulong _NotAFile = 9187201950435737471ul, 
@@ -20,8 +18,8 @@ public struct AttackTables{
             MaskPawnAttacks(i);
             MaskKnightAttacks(i);
             MaskKingAttacks(i);
-            MaskBishopAttacks(i);
-            MaskRookAttacks(i);
+            GenerateBishopAttacks(i, 0ul);
+            GenerateRookAttacks(i, 0ul);
         }
     }
 
@@ -33,8 +31,8 @@ public struct AttackTables{
         wattacks |= (bitboard << 9) & _NotHFile;
         battacks |= (bitboard >> 7) & _NotHFile;
         battacks |= (bitboard >> 9) & _NotAFile;
-        PawnAttacks[(int)Color.White, index] = wattacks;
-        PawnAttacks[(int)Color.Black, index] = battacks;
+        PawnAttacks[(int)Side.White, index] = wattacks;
+        PawnAttacks[(int)Side.Black, index] = battacks;
     }
 
     // Pregenerates attack moves for Knight
@@ -68,7 +66,7 @@ public struct AttackTables{
     }
 
     // Generates occupancy bits for bishop (Not attack moves)
-    private static void MaskBishopAttacks(int index){
+    private static ulong MaskBishopAttacks(int index){
         ulong attacks = 0ul;
         int rank, file;
         int targetRank = index / 8, targetFile = index % 8;
@@ -80,11 +78,11 @@ public struct AttackTables{
             attacks |= 1ul << (rank * Board.BoardSize + file);
         for (rank = targetRank - 1, file = targetFile - 1; rank >= 1 && file >= 1; rank--, file--)
             attacks |= 1ul << (rank * Board.BoardSize + file);
-        BishopAttacks[index] = attacks;
+        return attacks;
     }
 
     // Generates occupancy bits for rook (Not attack moves)
-    private static void MaskRookAttacks(int index){
+    private static ulong MaskRookAttacks(int index){
         ulong attacks = 0ul;
         int rank, file;
         int targetRank = index / 8, targetFile = index % 8;
@@ -96,6 +94,62 @@ public struct AttackTables{
             attacks |= 1ul << (targetRank * Board.BoardSize + file);
         for (file = targetFile - 1; file >= 1; file--)
             attacks |= 1ul << (targetRank * Board.BoardSize + file);
+        return attacks;
+    }
+
+    // Generates bishop attacks on the fly
+    private static void GenerateBishopAttacks(int index, ulong blocker){
+        ulong attacks = 0ul;
+        int rank, file;
+        int targetRank = index / 8, targetFile = index % 8;
+        for (rank = targetRank + 1, file = targetFile + 1; rank <= 7 && file <= 7; rank++, file++){
+            int square = rank * Board.BoardSize + file;
+            attacks |= 1ul << square;
+            if (Helper.CheckBit(1ul << square, blocker, square)) break;
+        }
+        for (rank = targetRank - 1, file = targetFile + 1; rank >= 0 && file <= 7; rank--, file++){
+            int square = rank * Board.BoardSize + file;
+            attacks |= 1ul << square;
+            if (Helper.CheckBit(1ul << square, blocker, square)) break;
+        }
+        for (rank = targetRank + 1, file = targetFile - 1; rank <= 7 && file >= 0; rank++, file--){
+            int square = rank * Board.BoardSize + file;
+            attacks |= 1ul << square;
+            if (Helper.CheckBit(1ul << square, blocker, square)) break;
+        }
+        for (rank = targetRank - 1, file = targetFile - 1; rank >= 0 && file >= 0; rank--, file--){
+            int square = rank * Board.BoardSize + file;
+            attacks |= 1ul << square;
+            if (Helper.CheckBit(1ul << square, blocker, square)) break;
+        }
+        BishopAttacks[index] = attacks;
+    }
+
+    // Generates rook attacks on the fly
+    private static void GenerateRookAttacks(int index, ulong blocker){
+        ulong attacks = 0ul;
+        int rank, file;
+        int targetRank = index / 8, targetFile = index % 8;
+        for (rank = targetRank + 1; rank <= 7; rank++){
+            int square = rank * Board.BoardSize + targetFile;
+            attacks |= 1ul << square;
+            if (Helper.CheckBit(1ul << square, blocker, square)) break;
+        }
+        for (rank = targetRank - 1; rank >= 0; rank--){
+            int square = rank * Board.BoardSize + targetFile;
+            attacks |= 1ul << square;
+            if (Helper.CheckBit(1ul << square, blocker, square)) break;
+        }
+        for (file = targetFile + 1; file <= 7; file++){
+            int square = targetRank * Board.BoardSize + file;
+            attacks |= 1ul << square;
+            if (Helper.CheckBit(1ul << square, blocker, square)) break;
+        }
+        for (file = targetFile - 1; file >= 0; file--){
+            int square = targetRank * Board.BoardSize + file;
+            attacks |= 1ul << square;
+            if (Helper.CheckBit(1ul << square, blocker, square)) break;
+        }
         RookAttacks[index] = attacks;
     }
 }

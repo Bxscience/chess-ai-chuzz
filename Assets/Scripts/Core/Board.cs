@@ -5,12 +5,12 @@ public struct Board{
     public const int BitboardCount = 12;
     public const int BoardSize = 8;
     private readonly string _FENPosition;
-    public Color PlayerTurn;
+    public Side PlayerTurn;
     public ulong[] Bitboards;
     public ulong Wpieces, Bpieces;
 
     public Board(string FEN){
-        PlayerTurn = Color.White;
+        PlayerTurn = Side.White;
         Bitboards = new ulong[BitboardCount];
         for (int i = 0; i < BitboardCount; i++)
             Bitboards[i] = ulong.MinValue;
@@ -24,7 +24,7 @@ public struct Board{
     }
 
     public void TestBoard(){
-        Helper.PrintBitboard(AttackTables.RookAttacks[(int)Square.d4]);
+        UnityEngine.Debug.Log("");
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal

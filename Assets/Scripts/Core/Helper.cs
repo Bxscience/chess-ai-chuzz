@@ -3,10 +3,11 @@ public enum Piece{
     BPawn = 6, BBishop = 7, BKnight = 8, BRook = 9, BQueen = 10, BKing = 11
 }
 
-public enum Color{
+public enum Side{
     Black = 0, White = 1
 }
 
+// Enum Defining Squares to Bitboard Indexes used for move generation
 public enum Square{
     h1, g1, f1, e1, d1, c1, b1, a1,
     h2, g2, f2, e2, d2, c2, b2, a2,
@@ -21,6 +22,8 @@ public enum Square{
 
 public struct Helper{
 //======================================== Bit Manipulation ========================================//
+// Some bit twiddling hacks came from http://graphics.stanford.edu/%7Eseander/bithacks.html
+
     // Returns the bit (in int type) in a bitboard of an index
     public static int GetBit(ulong Bitboard, int index){return (int)(Bitboard >> index & 1ul);}
 
@@ -29,6 +32,28 @@ public struct Helper{
 
     // If bit is on at a certain index, change to zero, otherwise do nothing
     public static void PopBit(ref ulong Bitboard, int index){if (GetBit(Bitboard, index) == 1) Bitboard ^= 1ul << index;}
+
+    // Returns true if two ulongs have the same value at the same index, else returns false
+    public static bool CheckBit(ulong a, ulong b, int index){return GetBit(a, index) == GetBit(b, index);}
+
+    // Returns the amount of bits on in a bitboard (WIP, might update to more efficient method)
+    public static int CountBit(ulong Bitboard){
+        int count = 0;
+        while(Bitboard > 0ul){
+            count++;
+            Bitboard &= Bitboard - 1;
+        }
+        return count;
+    }
+
+    // (WIP, need to make sure if its MSB or LSB)
+    public static int MSBIndex(ulong Bitboard){
+        if (Bitboard != 0ul){
+            return CountBit((Bitboard & ~Bitboard + 1) - 1);
+        }
+        else
+            return -1;
+    }
 
 //======================================== Output ========================================//
     // Prints out the bitboard in a human-friendly way
