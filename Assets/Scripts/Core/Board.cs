@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 public struct Board{
     private const string _DefaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
@@ -24,8 +25,6 @@ public struct Board{
     }
 
     public void TestBoard(){
-        Helper.PrintBitboard(Bitboards[(int)Piece.WPawn]);
-        UnityEngine.Debug.Log(Helper.LSBIndex(Bitboards[(int)Piece.WPawn]));
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal

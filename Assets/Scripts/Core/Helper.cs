@@ -1,4 +1,4 @@
-using Unity.Burst.Intrinsics;
+using System;
 
 public enum Piece{
     WPawn = 0, WBishop = 1, WKnight = 2, WRook = 3, WQueen = 4, WKing = 5,
@@ -80,7 +80,11 @@ public struct Helper{
         return (int)count + 1;
     }
 
-    //public static ulong GetRandomUlong(){}
+    // Gets a random ulong for the magic bitboard
+    public static ulong GetRandomUlong(){
+        var rand = new Random();
+        return (ulong)rand.Next() << 32 | (uint)rand.Next();
+    }
 
 //======================================== Output ========================================//
     // Prints out the bitboard in a human-friendly way

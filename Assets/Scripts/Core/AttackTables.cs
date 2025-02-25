@@ -6,11 +6,11 @@ public struct AttackTables{
                        _NotGHFile = 18229723555195321596ul;
 
     // Pregenerated Pawn Attacks Table
-    public static ulong[,] PawnAttacks = new ulong[2, Board.BoardSize * Board.BoardSize];
-    public static ulong[] KnightAttacks = new ulong[Board.BoardSize * Board.BoardSize];
-    public static ulong[] KingAttacks = new ulong[Board.BoardSize * Board.BoardSize];
-    public static ulong[] BishopAttacks = new ulong[Board.BoardSize * Board.BoardSize];
-    public static ulong[] RookAttacks = new ulong[Board.BoardSize * Board.BoardSize];
+    public readonly static ulong[,] PawnAttacks = new ulong[2, Board.BoardSize * Board.BoardSize];
+    public readonly static ulong[] KnightAttacks = new ulong[Board.BoardSize * Board.BoardSize];
+    public readonly static ulong[] KingAttacks = new ulong[Board.BoardSize * Board.BoardSize];
+    public readonly static ulong[] BishopAttacks = new ulong[Board.BoardSize * Board.BoardSize];
+    public readonly static ulong[] RookAttacks = new ulong[Board.BoardSize * Board.BoardSize];
 
     // Create Attack Tables
     public static void InitAttackTables(){
