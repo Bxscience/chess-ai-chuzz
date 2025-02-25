@@ -24,12 +24,7 @@ public struct Board{
     }
 
     public void TestBoard(){
-        AttackTables.InitAttackTables();
-        Helper.PrintBitboard(AttackTables.KnightAttacks[(int)Square.a1]);
-        Helper.PrintBitboard(AttackTables.KnightAttacks[(int)Square.h1]);
-        Helper.PrintBitboard(AttackTables.KnightAttacks[(int)Square.a8]);
-        Helper.PrintBitboard(AttackTables.KnightAttacks[(int)Square.h8]);
-
+        Helper.PrintBitboard(AttackTables.RookAttacks[(int)Square.d4]);
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal

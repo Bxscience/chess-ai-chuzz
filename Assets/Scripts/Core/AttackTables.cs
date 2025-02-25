@@ -2,7 +2,7 @@ using UnityEngine.UIElements.Experimental;
 
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
-    public const ulong _NotAFile = 9187201950435737471ul, 
+    private const ulong _NotAFile = 9187201950435737471ul, 
                        _NotHFile = 18374403900871474942ul,
                        _NotABFile = 4557430888798830399ul,
                        _NotGHFile = 18229723555195321596ul;
@@ -11,6 +11,8 @@ public struct AttackTables{
     public static ulong[,] PawnAttacks = new ulong[2, Board.BoardSize * Board.BoardSize];
     public static ulong[] KnightAttacks = new ulong[Board.BoardSize * Board.BoardSize];
     public static ulong[] KingAttacks = new ulong[Board.BoardSize * Board.BoardSize];
+    public static ulong[] BishopAttacks = new ulong[Board.BoardSize * Board.BoardSize];
+    public static ulong[] RookAttacks = new ulong[Board.BoardSize * Board.BoardSize];
 
     // Create Attack Tables
     public static void InitAttackTables(){
@@ -18,6 +20,8 @@ public struct AttackTables{
             MaskPawnAttacks(i);
             MaskKnightAttacks(i);
             MaskKingAttacks(i);
+            MaskBishopAttacks(i);
+            MaskRookAttacks(i);
         }
     }
 
@@ -33,18 +37,18 @@ public struct AttackTables{
         PawnAttacks[(int)Color.Black, index] = battacks;
     }
 
-    // Need to fix AHHHHHHH (Error when knights at edges due to move being inside _NOT files)
+    // Pregenerates attack moves for Knight
     private static void MaskKnightAttacks(int index){
         ulong attacks = 0ul, bitboard = 0ul;
         Helper.SetBit(ref bitboard, index);
         attacks |= (bitboard << 6) & _NotABFile;
         attacks |= (bitboard << 10) & _NotGHFile;
-        attacks |= (bitboard << 15) & _NotABFile;
-        attacks |= (bitboard << 17) & _NotGHFile;
+        attacks |= (bitboard << 15) & _NotAFile;
+        attacks |= (bitboard << 17) & _NotHFile;
         attacks |= (bitboard >> 6) & _NotGHFile;
         attacks |= (bitboard >> 10) & _NotABFile;
-        attacks |= (bitboard >> 15) & _NotGHFile;
-        attacks |= (bitboard >> 17) & _NotABFile;
+        attacks |= (bitboard >> 15) & _NotHFile;
+        attacks |= (bitboard >> 17) & _NotAFile;
         KnightAttacks[index] = attacks;
     }
 
@@ -63,4 +67,35 @@ public struct AttackTables{
         KingAttacks[index] = attacks;
     }
 
+    // Generates occupancy bits for bishop (Not attack moves)
+    private static void MaskBishopAttacks(int index){
+        ulong attacks = 0ul;
+        int rank, file;
+        int targetRank = index / 8, targetFile = index % 8;
+        for (rank = targetRank + 1, file = targetFile + 1; rank <= 6 && file <= 6; rank++, file++)
+            attacks |= 1ul << (rank * Board.BoardSize + file);
+        for (rank = targetRank - 1, file = targetFile + 1; rank >= 1 && file <= 6; rank--, file++)
+            attacks |= 1ul << (rank * Board.BoardSize + file);
+        for (rank = targetRank + 1, file = targetFile - 1; rank <= 6 && file >= 1; rank++, file--)
+            attacks |= 1ul << (rank * Board.BoardSize + file);
+        for (rank = targetRank - 1, file = targetFile - 1; rank >= 1 && file >= 1; rank--, file--)
+            attacks |= 1ul << (rank * Board.BoardSize + file);
+        BishopAttacks[index] = attacks;
+    }
+
+    // Generates occupancy bits for rook (Not attack moves)
+    private static void MaskRookAttacks(int index){
+        ulong attacks = 0ul;
+        int rank, file;
+        int targetRank = index / 8, targetFile = index % 8;
+        for (rank = targetRank + 1; rank <= 6; rank++)
+            attacks |= 1ul << (rank * Board.BoardSize + targetFile);
+        for (rank = targetRank - 1; rank >= 1; rank--)
+            attacks |= 1ul << (rank * Board.BoardSize + targetFile);
+        for (file = targetFile + 1; file <= 6; file++)
+            attacks |= 1ul << (targetRank * Board.BoardSize + file);
+        for (file = targetFile - 1; file >= 1; file--)
+            attacks |= 1ul << (targetRank * Board.BoardSize + file);
+        RookAttacks[index] = attacks;
+    }
 }
