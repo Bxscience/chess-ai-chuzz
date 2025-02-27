@@ -1,3 +1,5 @@
+using UnityEngine.Rendering.RenderGraphModule;
+
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
     private const ulong _NotAFile = 9187201950435737471ul, 
@@ -18,8 +20,12 @@ public struct AttackTables{
             MaskPawnAttacks(i);
             MaskKnightAttacks(i);
             MaskKingAttacks(i);
-            GenerateBishopAttacks(i, 0ul);
-            GenerateRookAttacks(i, 0ul);
+            MaskRookAttacks(i);
+            //GenerateBishopAttacks(i, 0ul);
+            //GenerateRookAttacks(i, 0ul);
+        }
+        for (int j = 0; j < 4096; j++){
+            Helper.PrintBitboard(SetOccupancy(j, Helper.CountBit(RookAttacks[(int)Square.a1]), RookAttacks[(int)Square.a1]));
         }
     }
 
@@ -151,5 +157,17 @@ public struct AttackTables{
             if (Helper.CheckBit(1ul << square, blocker, square)) break;
         }
         RookAttacks[index] = attacks;
+    }
+
+    // Need to fix occupancy method
+    private static ulong SetOccupancy(int index, int bitsInMask, ulong attackMask){
+        ulong occupancy = 0ul;
+        for(int i = 0; i < bitsInMask; i++){
+            int square = Helper.MSBIndex(attackMask);
+            Helper.PopBit(ref attackMask, square);
+            if (Helper.CheckBit((ulong)index, 1ul << i, index))
+                occupancy |= 1ul << square;
+        }
+        return occupancy;
     }
 }

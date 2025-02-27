@@ -24,7 +24,6 @@ public struct Board{
     }
 
     public void TestBoard(){
-        UnityEngine.Debug.Log("");
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal
