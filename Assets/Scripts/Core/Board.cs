@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 public struct Board{
     private const string _DefaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
