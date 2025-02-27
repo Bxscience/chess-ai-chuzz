@@ -1,5 +1,3 @@
-using UnityEngine.Rendering.RenderGraphModule;
-
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
     private const ulong _NotAFile = 9187201950435737471ul, 
@@ -20,12 +18,13 @@ public struct AttackTables{
             MaskPawnAttacks(i);
             MaskKnightAttacks(i);
             MaskKingAttacks(i);
-            MaskRookAttacks(i);
             //GenerateBishopAttacks(i, 0ul);
             //GenerateRookAttacks(i, 0ul);
+            RookAttacks[i] = MaskRookAttacks(i);
         }
         for (int j = 0; j < 4096; j++){
-            Helper.PrintBitboard(SetOccupancy(j, Helper.CountBit(RookAttacks[(int)Square.a1]), RookAttacks[(int)Square.a1]));
+            ulong bitboard = RookAttacks[(int)Square.a1];
+            Helper.PrintBitboard(SetOccupancy(j, Helper.CountBit(bitboard), bitboard));
         }
     }
 
@@ -159,13 +158,13 @@ public struct AttackTables{
         RookAttacks[index] = attacks;
     }
 
-    // Need to fix occupancy method
+    // Converts index to a speific position on the attack mask
     private static ulong SetOccupancy(int index, int bitsInMask, ulong attackMask){
-        ulong occupancy = 0ul;
+        ulong occupancy = 0ul, bitboard = attackMask;
         for(int i = 0; i < bitsInMask; i++){
-            int square = Helper.LSBIndex(attackMask);
-            Helper.PopBit(ref attackMask, square);
-            if (Helper.CheckBit((ulong)index, 1ul << i, index))
+            int square = Helper.LSBIndex(bitboard);
+            Helper.PopBit(ref bitboard, square);
+            if (Helper.CheckBit((ulong)index, 1ul << i, i))
                 occupancy |= 1ul << square;
         }
         return occupancy;

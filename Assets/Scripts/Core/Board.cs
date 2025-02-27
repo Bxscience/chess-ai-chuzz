@@ -25,6 +25,13 @@ public struct Board{
     }
 
     public void TestBoard(){
+        //ulong bitboard = AttackTables.RookAttacks[(int)Square.a1];
+        //Helper.PrintBitboard(bitboard);
+        //UnityEngine.Debug.Log(Helper.LSBIndex(bitboard));
+        //Helper.PopBit(ref bitboard, Helper.LSBIndex(bitboard));
+        //Helper.PrintBitboard(bitboard);
+        //UnityEngine.Debug.Log(Helper.LSBIndex(bitboard));
+
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal

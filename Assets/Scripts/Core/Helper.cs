@@ -77,7 +77,7 @@ public struct Helper{
             }
             count -= Bitboard & 0x1;
         }
-        return (int)count + 1;
+        return (int)count;
     }
 
     // Gets a random ulong for the magic bitboard
