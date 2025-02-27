@@ -163,7 +163,7 @@ public struct AttackTables{
     private static ulong SetOccupancy(int index, int bitsInMask, ulong attackMask){
         ulong occupancy = 0ul;
         for(int i = 0; i < bitsInMask; i++){
-            int square = Helper.MSBIndex(attackMask);
+            int square = Helper.LSBIndex(attackMask);
             Helper.PopBit(ref attackMask, square);
             if (Helper.CheckBit((ulong)index, 1ul << i, index))
                 occupancy |= 1ul << square;
