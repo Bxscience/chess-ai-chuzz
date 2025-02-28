@@ -25,9 +25,7 @@ public struct Board{
     }
 
     public void TestBoard(){
-        for (int i = 0; i < 64; i++){
-            Helper.PrintBitboard(Helper.GetBiasedUlong());
-        }
+        //MagicBitboards.InitMagicNumbers();
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal
