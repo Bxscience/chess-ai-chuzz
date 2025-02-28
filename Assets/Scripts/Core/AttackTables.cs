@@ -183,7 +183,7 @@ public struct AttackTables{
         return RookAttacks[square, occupancy];
     }
 
-// Validate whether two above functions work properly, as well as understand what they do
+//TODO: Validate whether two above functions work properly, as well as understand what they do
 
     private static void InitSlidersAttacks(bool isBishop){
         for (int square = 0; square < Board.BoardSize * Board.BoardSize; square++){
