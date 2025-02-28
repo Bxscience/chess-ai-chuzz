@@ -20,11 +20,6 @@ public struct AttackTables{
             MaskKingAttacks(i);
             //GenerateBishopAttacks(i, 0ul);
             //GenerateRookAttacks(i, 0ul);
-            RookAttacks[i] = MaskRookAttacks(i);
-        }
-        for (int j = 0; j < 4096; j++){
-            ulong bitboard = RookAttacks[(int)Square.a1];
-            Helper.PrintBitboard(SetOccupancy(j, Helper.CountBit(bitboard), bitboard));
         }
     }
 

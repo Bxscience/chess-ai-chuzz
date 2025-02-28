@@ -26,6 +26,12 @@ public struct Helper{
 //======================================== Bit Manipulation ========================================//
 // Some bit twiddling hacks came from http://graphics.stanford.edu/%7Eseander/bithacks.html
 
+    // Gets a random ulong for the magic bitboard
+    private static ulong GetRandomUlong(){
+        Random rand = new Random();
+        return (ulong)rand.Next() << 32 | (uint)rand.Next();
+    }
+
     // Returns the bit (in int type) in a bitboard of an index
     public static int GetBit(ulong Bitboard, int index){return (int)(Bitboard >> index & 1ul);}
 
@@ -80,10 +86,9 @@ public struct Helper{
         return (int)count;
     }
 
-    // Gets a random ulong for the magic bitboard
-    public static ulong GetRandomUlong(){
-        var rand = new Random();
-        return (ulong)rand.Next() << 32 | (uint)rand.Next();
+    // Returns a ulong with a bias towards zero
+    public static ulong GetBiasedUlong(){
+        return GetRandomUlong() & GetRandomUlong() & GetRandomUlong();
     }
 
 //======================================== Output ========================================//

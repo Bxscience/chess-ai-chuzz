@@ -1,5 +1,5 @@
 using System;
-using System.Diagnostics;
+using UnityEditor;
 
 public struct Board{
     private const string _DefaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
@@ -25,13 +25,9 @@ public struct Board{
     }
 
     public void TestBoard(){
-        //ulong bitboard = AttackTables.RookAttacks[(int)Square.a1];
-        //Helper.PrintBitboard(bitboard);
-        //UnityEngine.Debug.Log(Helper.LSBIndex(bitboard));
-        //Helper.PopBit(ref bitboard, Helper.LSBIndex(bitboard));
-        //Helper.PrintBitboard(bitboard);
-        //UnityEngine.Debug.Log(Helper.LSBIndex(bitboard));
-
+        for (int i = 0; i < 64; i++){
+            Helper.PrintBitboard(Helper.GetBiasedUlong());
+        }
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal
