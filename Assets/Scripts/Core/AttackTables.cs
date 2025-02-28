@@ -1,5 +1,3 @@
-using UnityEngine.UIElements;
-
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
     private const ulong _NotAFile = 9187201950435737471ul, 
