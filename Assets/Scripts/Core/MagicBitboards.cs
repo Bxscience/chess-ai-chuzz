@@ -20,16 +20,24 @@ public struct MagicBitboards{
         // Occupancy indicies determines the actual possible configurations of blockers a piece on that square has
         // AKA the amount of different occupancies for a piece on that square
         int occupancyIndicies = 1 << relevantbits;
-        // For every possible configuration, the occupancy is set, 
+
+        // For every possible configuration, the occupancy is set, using the set occupancy method through a given index
+        // attacks come from the result of finding occupancies and using the generatepieceattacks method
         for (int i = 0; i < occupancyIndicies; i++){
             occupancies[i] = AttackTables.SetOccupancy(i, relevantbits, attackMask);
             attacks[i] = isBishop ? AttackTables.GenerateBishopAttacks(index, occupancies[i]) : AttackTables.GenerateRookAttacks(index, occupancies[i]); 
         }
+
+        // Generating numbers for a large amount of iterations
         for (int count = 0; count < 0xFFFFFF; count++){
+            // Generates a biased ulong as a magic number candidate
             ulong magicNumber = Helper.GetBiasedUlong();
+            // CONFIRM: Unsure if this condition is needed, try method without
             if (Helper.CountBit((attackMask * magicNumber) & 0xFF00000000000000) < 6) continue; 
             int i = 0;
             bool fail = false;
+            // Testing the magic number, by multiplying the magic number with all the occupancies available on that square
+            // 
             for (i = 0; !fail & i < occupancyIndicies; i++){
                 int magicIndex = (int)((occupancies[index] * magicNumber) >> (64 - relevantbits));
                 if (usedAttacks[magicIndex] == 0ul)
@@ -39,7 +47,7 @@ public struct MagicBitboards{
             if (!fail)
                 return magicNumber;
         }
-        return 0ul;
+        throw new System.Exception("Magic Number not found for " + (Square)index);
     }
 
     public static void InitMagicNumbers(){
