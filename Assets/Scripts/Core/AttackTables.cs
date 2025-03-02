@@ -1,3 +1,5 @@
+using UnityEngine.UI;
+
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
     private const ulong _NotAFile = 9187201950435737471ul, 
@@ -20,7 +22,7 @@ public struct AttackTables{
     public static void InitAttackTables(){
         InitSlidersAttacks(true);
         ulong occupancy = 0ul;
-        Helper.PrintBitboard(GenerateBishopAttacks((int)Square.d4, occupancy));
+        Helper.PrintBitboard(GetRookAttacks((int)Square.d4, occupancy));
         Helper.PrintBitboard(GetBishopAttacks((int)Square.d4, occupancy));
     }
 
@@ -186,7 +188,7 @@ public struct AttackTables{
     private static void InitSlidersAttacks(bool isBishop){
         for (int square = 0; square < Board.BoardSize * Board.BoardSize; square++){
             BishopMasks[square] = MaskBishopAttacks(square);
-            RookMasks[square] = MaskBishopAttacks(square);
+            RookMasks[square] = MaskRookAttacks(square);
             ulong attackMask = isBishop ? BishopMasks[square] : RookMasks[square];
             int relevantbits = isBishop ? Pregen.BishopRelevantBits[square] : Pregen.RookRelevantBits[square];
             int occupancyIndicies = 1 << relevantbits;
@@ -198,7 +200,7 @@ public struct AttackTables{
                 } else { 
                     ulong occupancy = SetOccupancy(index, relevantbits, attackMask);
                     int magicIndex = (int)((occupancy * MagicBitboards.FindMagicNumber(index, relevantbits, isBishop)) >> (64 - relevantbits));
-                    BishopAttacks[square, magicIndex] = GenerateBishopAttacks(square, occupancy);
+                    BishopAttacks[square, magicIndex] = GenerateRookAttacks(square, occupancy);
                 }
             }
         }

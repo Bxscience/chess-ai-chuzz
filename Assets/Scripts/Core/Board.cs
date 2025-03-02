@@ -1,6 +1,5 @@
 using System;
-using UnityEditor;
-
+    
 public struct Board{
     private const string _DefaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
     public const int BitboardCount = 12;
@@ -25,7 +24,7 @@ public struct Board{
     }
 
     public void TestBoard(){
-        //MagicBitboards.InitMagicNumbers();
+        MagicBitboards.InitMagicNumbers();
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal
