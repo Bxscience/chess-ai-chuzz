@@ -6,7 +6,7 @@ public enum Piece{
 }
 
 public enum Side{
-    Black = 0, White = 1
+    Black = 0, White = 1, Both = 2
 }
 
 // Enum Defining Squares to Bitboard Indexes used for move generation
@@ -86,7 +86,7 @@ public struct Helper{
         return (int)count;
     }
 
-    // Returns a ulong with a bias towards zero
+    // Returns a ulong with a bias towards zero bits
     public static ulong GetBiasedUlong() => GetRandomUlong() & GetRandomUlong() & GetRandomUlong();
     
 
