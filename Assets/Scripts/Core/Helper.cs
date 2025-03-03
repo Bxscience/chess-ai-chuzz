@@ -33,16 +33,16 @@ public struct Helper{
     }
 
     // Returns the bit (in int type) in a bitboard of an index
-    public static int GetBit(ulong Bitboard, int index){return (int)(Bitboard >> index & 1ul);}
+    public static int GetBit(ulong Bitboard, int index) => (int)((Bitboard >> index) & 1ul);
 
     // Changes the bit in a bitboard of an index to 1
-    public static void SetBit(ref ulong Bitboard, int index){Bitboard |= 1ul << index;}
+    public static void SetBit(ref ulong Bitboard, int index) => (Bitboard) |= (1ul << index);
 
     // If bit is on at a certain index, change to zero, otherwise do nothing
-    public static void PopBit(ref ulong Bitboard, int index){if (GetBit(Bitboard, index) == 1) Bitboard ^= 1ul << index;}
+    public static void PopBit(ref ulong Bitboard, int index) => (Bitboard) &= ~(1ul << index);
 
     // Returns true if two ulongs have the same value at the same index, else returns false
-    public static bool CheckBit(ulong a, ulong b, int index){return GetBit(a, index) == GetBit(b, index);}
+    public static bool CheckBit(ulong a, ulong b, int index) => GetBit(a, index) == GetBit(b, index);
 
     // Returns the amount of bits on in a bitboard (WIP, might update to more efficient method)
     public static int CountBit(ulong Bitboard){
@@ -87,9 +87,8 @@ public struct Helper{
     }
 
     // Returns a ulong with a bias towards zero
-    public static ulong GetBiasedUlong(){
-        return GetRandomUlong() & GetRandomUlong() & GetRandomUlong();
-    }
+    public static ulong GetBiasedUlong() => GetRandomUlong() & GetRandomUlong() & GetRandomUlong();
+    
 
 //======================================== Output ========================================//
     // Prints out the bitboard in a human-friendly way
