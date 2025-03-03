@@ -1,5 +1,5 @@
 public struct MagicBitboards{
-    // TODO: Understand this function fully and fix if needed
+    // Not used during runtime, used to pre-generate magic numbers
     public static ulong FindMagicNumber(int square, int relevantbits, bool isBishop){
         // Occupancies represent different positions of blocks & available moves
         // Max length is determined by all possible moves the piece has (9 for bishop, 12 for rook)
@@ -52,6 +52,18 @@ public struct MagicBitboards{
         throw new System.Exception("Magic Number not found for " + (Square)square);
     }
 
+    // One time use to get magic numbers
     public static void InitMagicNumbers(){
+        string output = "";
+        string nonconvert = "";
+        for (int i = 0; i < 64; i++){
+            if (i % 8 == 0 && i > 0)
+                output += "\n";
+            ulong number = FindMagicNumber(i, Pregen.BishopRelevantBits[i], true);
+            nonconvert += number + ", ";
+            output += string.Format("0x{0:x4}", number) + ", ";
+        }
+        UnityEngine.Debug.Log(nonconvert);
+        UnityEngine.Debug.Log(output);
     }
 }

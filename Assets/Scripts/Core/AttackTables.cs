@@ -21,6 +21,7 @@ public struct AttackTables{
     // Create Attack Tables
     public static void InitAttackTables(){
         InitSlidersAttacks(true);
+        InitSlidersAttacks(false);
         ulong occupancy = 0ul;
         Helper.PrintBitboard(GetRookAttacks((int)Square.d4, occupancy));
         Helper.PrintBitboard(GetBishopAttacks((int)Square.d4, occupancy));
@@ -168,23 +169,7 @@ public struct AttackTables{
         return occupancy;
     }
 
-//======================================== Get Moves from Pieces ========================================//
-    public static ulong GetBishopAttacks(int square, ulong occupancy){
-        occupancy &= BishopMasks[square];
-        occupancy *= MagicBitboards.FindMagicNumber(square, Pregen.BishopRelevantBits[square], true);
-        occupancy >>= 64 - Pregen.BishopRelevantBits[square];
-        return BishopAttacks[square, occupancy];
-    }
-
-    public static ulong GetRookAttacks(int square, ulong occupancy){
-        occupancy &= RookMasks[square];
-        occupancy *= MagicBitboards.FindMagicNumber(square, Pregen.BishopRelevantBits[square], false);
-        occupancy >>= 64 - Pregen.RookRelevantBits[square];
-        return RookAttacks[square, occupancy];
-    }
-
-//TODO: Validate whether two above functions work properly, as well as understand what they do
-
+    // Initialize sliding pieces
     private static void InitSlidersAttacks(bool isBishop){
         for (int square = 0; square < Board.BoardSize * Board.BoardSize; square++){
             BishopMasks[square] = MaskBishopAttacks(square);
@@ -195,14 +180,30 @@ public struct AttackTables{
             for (int index = 0; index < occupancyIndicies; index++){
                 if (isBishop){
                     ulong occupancy = SetOccupancy(index, relevantbits, attackMask);
-                    int magicIndex = (int)((occupancy * MagicBitboards.FindMagicNumber(index, relevantbits, isBishop)) >> (64 - relevantbits));
+                    int magicIndex = (int)((occupancy * Pregen.BishopMagics[square]) >> (64 - relevantbits));
                     BishopAttacks[square, magicIndex] = GenerateBishopAttacks(square, occupancy);
                 } else { 
                     ulong occupancy = SetOccupancy(index, relevantbits, attackMask);
-                    int magicIndex = (int)((occupancy * MagicBitboards.FindMagicNumber(index, relevantbits, isBishop)) >> (64 - relevantbits));
-                    BishopAttacks[square, magicIndex] = GenerateRookAttacks(square, occupancy);
+                    int magicIndex = (int)((occupancy * Pregen.RookMagics[square]) >> (64 - relevantbits));
+                    RookAttacks[square, magicIndex] = GenerateRookAttacks(square, occupancy);
                 }
             }
         }
+    }
+
+//======================================== Get Moves from Pieces ========================================//
+    // Gets the moves 
+    public static ulong GetBishopAttacks(int square, ulong occupancy){
+        occupancy &= BishopMasks[square];
+        occupancy *= Pregen.BishopMagics[square];
+        occupancy >>= 64 - Pregen.BishopRelevantBits[square];
+        return BishopAttacks[square, occupancy];
+    }
+
+    public static ulong GetRookAttacks(int square, ulong occupancy){
+        occupancy &= RookMasks[square];
+        occupancy *= Pregen.RookMagics[square];
+        occupancy >>= 64 - Pregen.RookRelevantBits[square];
+        return RookAttacks[square, occupancy];
     }
 }
