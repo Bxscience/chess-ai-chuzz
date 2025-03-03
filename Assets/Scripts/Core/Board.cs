@@ -1,22 +1,24 @@
 using System;
     
 public struct Board{
-    private const string _DefaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    private const string _DefaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     public const int BitboardCount = 12;
     public const int OccupanciesCount = 3;
     public const int BoardSize = 8;
     private readonly string _FENPosition;
     public Side PlayerTurn;
+    public int Enpassant;
     public ulong[] Bitboards;
     public ulong[] Occupancies;
 
     public Board(string FEN){
-        PlayerTurn = Side.White;
         Bitboards = new ulong[BitboardCount];
-        for (int i = 0; i < BitboardCount; i++)
-            Bitboards[i] = ulong.MinValue;
-        _FENPosition = FEN == "" ? _DefaultPosition : FEN;
         Occupancies = new ulong[OccupanciesCount];
+        //for (int i = 0; i < BitboardCount; i++)
+        //    Bitboards[i] = ulong.MinValue;
+        _FENPosition = (FEN == "") ? _DefaultPosition : FEN;
+        PlayerTurn = Side.White;
+        Enpassant = -1;
         ParseFENString();
         Occupancies[(int)Side.White] = Bitboards[(int)Piece.WPawn] | Bitboards[(int)Piece.WBishop] | Bitboards[(int)Piece.WKnight] | 
                     Bitboards[(int)Piece.WRook] | Bitboards[(int)Piece.WQueen] | Bitboards[(int)Piece.WKing];
@@ -48,9 +50,17 @@ public struct Board{
 
     // Parses the FEN String and updates revelant bitboards with pieces
     private void ParseFENString(){
-        int index = 63;
-        for(int i = 0; i < _FENPosition.Length; i++){
-            char letter = _FENPosition[i];
+        // 0 => Board Position
+        // 1 => Turn to Move
+        // 2 => Castle Rights
+        // 3 => En Passant Square
+        // 4 => Half Move Clock
+        // 5 => Full Move Counter
+        string[] FENPartitions = _FENPosition.Split(" ");
+
+        // Parses Position FEN
+        for(int i = 0, index = 63; i < FENPartitions[0].Length; i++){
+            char letter = FENPartitions[0][i];
             if(char.IsLetter(letter)){
                 Helper.SetBit(ref Bitboards[(int)ValueSwitch(letter)], index);
                 index--;
@@ -58,5 +68,53 @@ public struct Board{
             else if (char.IsDigit(letter))
                 index -= (int)Char.GetNumericValue(letter);
         }
+
+        // Updates Turn to Move
+        PlayerTurn = FENPartitions[1] == "w" ? Side.White : Side.Black;
+
+        // TODO: Castling Rights
+        
+        // Holds Enpassant Square
+        Square result;
+        if (Enum.TryParse(FENPartitions[3], out result)) Enpassant = (int)result;
+        else if (FENPartitions[3][0] == '-') Enpassant = -1;
+        else throw new Exception("Invalid FEN String");
+
+        // TODO: Half Move Clock
+        // TODO: Full Move Counter
     }
+}
+
+// Enum to store index of bitboards
+public enum Piece{
+    WPawn, WBishop, WKnight, WRook, WQueen, WKing,
+    BPawn, BBishop, BKnight, BRook, BQueen, BKing
+}
+
+// Enum for side to move
+public enum Side{
+    Black = 0, White = 1, Both = 2
+}
+
+// Enum Defining Squares to Bitboard Indexes used for move generation
+public enum Square{
+    h1, g1, f1, e1, d1, c1, b1, a1,
+    h2, g2, f2, e2, d2, c2, b2, a2,
+    h3, g3, f3, e3, d3, c3, b3, a3,
+    h4, g4, f4, e4, d4, c4, b4, a4,
+    h5, g5, f5, e5, d5, c5, b5, a5,
+    h6, g6, f6, e6, d6, c6, b6, a6,
+    h7, g7, f7, e7, d7, c7, b7, a7,
+    h8, g8, f8, e8, d8, c8, b8, a8
+
+}
+
+// Relating to castling
+// 0001 = White King can Castle Kingside
+// 0010 = White King can Castle Queenside
+// 0100 = Black King can Castle Kingside
+// 1000 = Black King can Castle Queenside
+[Flags]
+public enum CastlingRights{
+    wk = 1, wq = 2, bk = 4, bq = 8
 }

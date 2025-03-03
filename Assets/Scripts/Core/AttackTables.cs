@@ -18,9 +18,6 @@ public struct AttackTables{
     public static void InitAttackTables(){
         InitSlidersAttacks(true);
         InitSlidersAttacks(false);
-        ulong occupancy = 0ul;
-        Helper.PrintBitboard(GetRookAttacks((int)Square.d4, occupancy));
-        Helper.PrintBitboard(GetBishopAttacks((int)Square.d4, occupancy));
     }
 
     // Pregenerates attack moves for both White and Black Pawns
