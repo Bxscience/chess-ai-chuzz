@@ -14,7 +14,6 @@ public struct AttackTables{
     public readonly static ulong[,] BishopAttacks = new ulong[Board.BoardSize * Board.BoardSize, 512];
     public readonly static ulong[,] RookAttacks = new ulong[Board.BoardSize * Board.BoardSize, 4096];
 
-
     public readonly static ulong[] BishopMasks = new ulong[Board.BoardSize * Board.BoardSize];
     public readonly static ulong[] RookMasks  = new ulong[Board.BoardSize * Board.BoardSize];
 
@@ -22,9 +21,6 @@ public struct AttackTables{
     public static void InitAttackTables(){
         InitSlidersAttacks(true);
         InitSlidersAttacks(false);
-        ulong occupancy = 0ul;
-        Helper.PrintBitboard(GetRookAttacks((int)Square.d4, occupancy));
-        Helper.PrintBitboard(GetBishopAttacks((int)Square.d4, occupancy));
     }
 
     // Pregenerates attack moves for both White and Black Pawns
@@ -206,4 +202,6 @@ public struct AttackTables{
         occupancy >>= 64 - Pregen.RookRelevantBits[square];
         return RookAttacks[square, occupancy];
     }
+
+    public static ulong GetQueenAttacks(int square, ulong occupancy) => GetBishopAttacks(square, occupancy) | GetRookAttacks(square, occupancy);
 }
