@@ -14,8 +14,6 @@ public struct Board{
     public Board(string FEN){
         Bitboards = new ulong[BitboardCount];
         Occupancies = new ulong[OccupanciesCount];
-        //for (int i = 0; i < BitboardCount; i++)
-        //    Bitboards[i] = ulong.MinValue;
         _FENPosition = (FEN == "") ? _DefaultPosition : FEN;
         PlayerTurn = Side.White;
         Enpassant = -1;

@@ -1,9 +1,9 @@
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
-    private const ulong _NotAFile = 9187201950435737471ul, 
-                       _NotHFile = 18374403900871474942ul,
-                       _NotABFile = 4557430888798830399ul,
-                       _NotGHFile = 18229723555195321596ul;
+    private const ulong _NotAFile = 0x7F7F7F7F7F7F7F7F, 
+                       _NotHFile = 0xFEFEFEFEFEFEFEFE,
+                       _NotABFile = 0x3F3F3F3F3F3F3F3F,
+                       _NotGHFile = 0xFCFCFCFCFCFCFCFC;
 
     // Pregenerated Pawn Attacks Table
     public readonly static ulong[,] PawnAttacks = new ulong[2, Board.BoardSize * Board.BoardSize];
@@ -11,18 +11,22 @@ public struct AttackTables{
     public readonly static ulong[] KingAttacks = new ulong[Board.BoardSize * Board.BoardSize];
     public readonly static ulong[,] BishopAttacks = new ulong[Board.BoardSize * Board.BoardSize, 512];
     public readonly static ulong[,] RookAttacks = new ulong[Board.BoardSize * Board.BoardSize, 4096];
-
     public readonly static ulong[] BishopMasks = new ulong[Board.BoardSize * Board.BoardSize];
     public readonly static ulong[] RookMasks  = new ulong[Board.BoardSize * Board.BoardSize];
 
     // Create Attack Tables
     public static void InitAttackTables(){
+        for (int square = 0; square > 64; square++){
+            MaskPawnAttacks(square);
+            MaskKnightAttacks(square);
+            MaskKingAttacks(square);
+        }
         InitSlidersAttacks(true);
         InitSlidersAttacks(false);
     }
 
     // Pregenerates attack moves for both White and Black Pawns
-    public static void MaskPawnAttacks(int index){
+    private static void MaskPawnAttacks(int index){
         ulong wattacks = 0ul, battacks = 0ul, bitboard = 0ul;
         Helper.SetBit(ref bitboard, index);
         wattacks |= (bitboard << 7) & _NotAFile;
@@ -34,7 +38,7 @@ public struct AttackTables{
     }
 
     // Pregenerates attack moves for Knight
-    public static ulong MaskKnightAttacks(int index){
+    private static void MaskKnightAttacks(int index){
         ulong attacks = 0ul, bitboard = 0ul;
         Helper.SetBit(ref bitboard, index);
         attacks |= (bitboard << 6) & _NotABFile;
@@ -45,11 +49,11 @@ public struct AttackTables{
         attacks |= (bitboard >> 10) & _NotABFile;
         attacks |= (bitboard >> 15) & _NotHFile;
         attacks |= (bitboard >> 17) & _NotAFile;
-        return attacks;
+        KnightAttacks[index] = attacks;
     }
 
     // Pregenerates attack moves for King
-    public static ulong MaskKingAttacks(int index){
+    private static void MaskKingAttacks(int index){
         ulong attacks = 0ul, bitboard = 0ul;
         Helper.SetBit(ref bitboard, index);
         attacks |= (bitboard << 1) & _NotHFile;
@@ -60,7 +64,7 @@ public struct AttackTables{
         attacks |= (bitboard >> 7) & _NotHFile;
         attacks |= bitboard >> 8;
         attacks |= (bitboard >> 9) & _NotAFile;
-        return attacks;
+        KingAttacks[index] = attacks;
     }
 
     // Generates occupancy bits for bishop (Not attack moves)
@@ -185,7 +189,7 @@ public struct AttackTables{
         }
     }
 
-    // Gets the moves for bishops at a speific square
+    // Gets the moves for bishops at a specific square
     public static ulong GetBishopAttacks(int square, ulong occupancy){
         occupancy &= BishopMasks[square];
         occupancy *= Pregen.BishopMagics[square];
@@ -193,13 +197,37 @@ public struct AttackTables{
         return BishopAttacks[square, occupancy];
     }
 
-    // Gets the moves for a rook at a speific square
+    // Gets the moves for a rook at a specific square
     public static ulong GetRookAttacks(int square, ulong occupancy){
         occupancy &= RookMasks[square];
         occupancy *= Pregen.RookMagics[square];
         occupancy >>= 64 - Pregen.RookRelevantBits[square];
         return RookAttacks[square, occupancy];
     }
-
+    
+    // Gets the moves for a queen at a specific square
     public static ulong GetQueenAttacks(int square, ulong occupancy) => GetBishopAttacks(square, occupancy) | GetRookAttacks(square, occupancy);
+
+
+    // TODO: Verify functionality of method
+    // Given a square to check whether it is attacked by the given side, after given a board position of bitboards and occupancies.
+    // For pawns, for a given square, find the attacks of a temp pawn of the opposite color on the given square
+    // If it attacks any of the pawns currently on the board, it means the square is being attacked
+    // Similar concept for other pieces, but since they are symmetric we don't need multiple if-conditions
+    public static bool IsSquareAttacked(int square, ulong[] bitboards, ulong[] occupancies, Side side){
+        // Checks attacks by white pawns
+        if (side == Side.White && (PawnAttacks[(int)Side.Black, square] & bitboards[(int)Piece.WPawn]) > 0) return true;
+        // Checks attacks by black pawns
+        if (side == Side.Black && (PawnAttacks[(int)Side.White, square] & bitboards[(int)Piece.BPawn]) > 0) return true;
+        // Checks attacks by knights
+        if ((KnightAttacks[square] & (side == Side.White ? bitboards[(int)Piece.WKnight] : bitboards[(int)Piece.BKnight])) > 0) return true;
+        // Checks attacks by kings
+        if ((KingAttacks[square] & (side == Side.White ? bitboards[(int)Piece.WKing] : bitboards[(int)Piece.BKing])) > 0) return true;
+        // Checks attacks by bishops        
+        if ((GetBishopAttacks(square, occupancies[(int)Side.Both]) & (side == Side.White ? bitboards[(int)Piece.WBishop] : bitboards[(int)Piece.BBishop])) > 0) return true;
+        // Checks attacks by rooks
+        if ((GetRookAttacks(square, occupancies[(int)Side.Both]) & (side == Side.White ? bitboards[(int)Piece.WRook] : bitboards[(int)Piece.BRook])) > 0) return true;
+        // No checks needed for queens as its covered by bishop & rook
+        return false;
+    }
 }
