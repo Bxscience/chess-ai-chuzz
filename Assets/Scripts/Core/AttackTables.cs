@@ -16,7 +16,7 @@ public struct AttackTables{
 
     // Create Attack Tables
     public static void InitAttackTables(){
-        for (int square = 0; square > 64; square++){
+        for (int square = 0; square < 64; square++){
             MaskPawnAttacks(square);
             MaskKnightAttacks(square);
             MaskKingAttacks(square);

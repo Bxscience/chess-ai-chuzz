@@ -26,6 +26,15 @@ public struct Board{
     }
 
     public void TestBoard(){
+        Helper.SetBit(ref Bitboards[(int)Piece.BPawn], (int)Square.e4);
+        Helper.PrintBitboard(Bitboards[(int)Piece.BPawn]);
+
+        Helper.PrintBitboard(AttackTables.PawnAttacks[(int)Side.Black, (int)Square.e4]);
+
+        UnityEngine.Debug.Log(AttackTables.IsSquareAttacked((int)Square.d3, Bitboards, Occupancies, Side.White));
+        UnityEngine.Debug.Log(AttackTables.IsSquareAttacked((int)Square.f3, Bitboards, Occupancies, Side.White));
+        UnityEngine.Debug.Log(AttackTables.IsSquareAttacked((int)Square.d3, Bitboards, Occupancies, Side.Black));
+        UnityEngine.Debug.Log(AttackTables.IsSquareAttacked((int)Square.f3, Bitboards, Occupancies, Side.Black));
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal
