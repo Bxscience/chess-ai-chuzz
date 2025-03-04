@@ -1,3 +1,5 @@
+using UnityEditor.ShaderGraph;
+
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
     private const ulong _NotAFile = 0x7F7F7F7F7F7F7F7F, 
@@ -6,13 +8,20 @@ public struct AttackTables{
                        _NotGHFile = 0xFCFCFCFCFCFCFCFC;
 
     // Pregenerated Pawn Attacks Table
-    public readonly static ulong[,] PawnAttacks = new ulong[2, Board.BoardSize * Board.BoardSize];
+    public readonly static ulong[,] PawnAttacks = new ulong[(int)Side.Both, Board.BoardSize * Board.BoardSize];
+    // Pregenerated Knights Attacks Table
     public readonly static ulong[] KnightAttacks = new ulong[Board.BoardSize * Board.BoardSize];
+    // Pregenerated King Attacks Table
     public readonly static ulong[] KingAttacks = new ulong[Board.BoardSize * Board.BoardSize];
+    // Pregenerated Bishop Attacks Table
     public readonly static ulong[,] BishopAttacks = new ulong[Board.BoardSize * Board.BoardSize, 512];
+    // Pregenerated Rook Attacks Table
     public readonly static ulong[,] RookAttacks = new ulong[Board.BoardSize * Board.BoardSize, 4096];
     public readonly static ulong[] BishopMasks = new ulong[Board.BoardSize * Board.BoardSize];
     public readonly static ulong[] RookMasks  = new ulong[Board.BoardSize * Board.BoardSize];
+
+    // Holds a bitmap for all squares that are attacked by each side, includes pieces occupied by other white pieces
+    public static ulong[,] AttackedSquares = new ulong[(int)Side.Both, Board.BoardSize * Board.BoardSize];
 
     // Create Attack Tables
     public static void InitAttackTables(){
@@ -155,7 +164,7 @@ public struct AttackTables{
         return attacks;
     }
 
-    // Converts index to a speific position on the attack mask
+    // Converts index to a specific position on the attack mask
     public static ulong SetOccupancy(int index, int bitsInMask, ulong attackMask){
         ulong occupancy = 0ul, bitboard = attackMask;
         for(int i = 0; i < bitsInMask; i++){
@@ -209,7 +218,6 @@ public struct AttackTables{
     public static ulong GetQueenAttacks(int square, ulong occupancy) => GetBishopAttacks(square, occupancy) | GetRookAttacks(square, occupancy);
 
 
-    // TODO: Verify functionality of method
     // Given a square to check whether it is attacked by the given side, after given a board position of bitboards and occupancies.
     // For pawns, for a given square, find the attacks of a temp pawn of the opposite color on the given square
     // If it attacks any of the pawns currently on the board, it means the square is being attacked
@@ -229,5 +237,28 @@ public struct AttackTables{
         if ((GetRookAttacks(square, occupancies[(int)Side.Both]) & (side == Side.White ? bitboards[(int)Piece.WRook] : bitboards[(int)Piece.BRook])) > 0) return true;
         // No checks needed for queens as its covered by bishop & rook
         return false;
+    }
+
+    public static void InitAttackedSquares(ulong[] Bitboards, Side side){
+        int offset = side == Side.White ? 0 : 6;
+        for (int count = offset; count < 6 + offset; count++){
+            ulong board = Bitboards[count];
+            int bits = Helper.CountBit(Bitboards[count]);
+            for (int iternator = 0; iternator < bits; iternator++){
+                int index = Helper.LSBIndex(board);
+                Helper.PopBit(ref board, index);
+                switch(count){
+                    case 0:
+                        break;
+                    case 6:
+                        break;
+                    case 1: case 7:
+                    case 2: case 8:
+                    case 3: case 9:
+                    case 4: case 10:
+                    case 5: case 11:
+                }
+            }
+        }
     }
 }

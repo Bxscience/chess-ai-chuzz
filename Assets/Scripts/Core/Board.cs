@@ -27,6 +27,8 @@ public struct Board{
 
     public void TestBoard(){
         Helper.SetBit(ref Bitboards[(int)Piece.BPawn], (int)Square.e4);
+        Helper.SetBit(ref Bitboards[(int)Piece.BPawn], (int)Square.f3);
+
         Helper.PrintBitboard(Bitboards[(int)Piece.BPawn]);
 
         Helper.PrintBitboard(AttackTables.PawnAttacks[(int)Side.Black, (int)Square.e4]);
