@@ -1,5 +1,3 @@
-using UnityEngine.UI;
-
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
     private const ulong _NotAFile = 9187201950435737471ul, 
@@ -165,7 +163,7 @@ public struct AttackTables{
         return occupancy;
     }
 
-    // Initialize sliding pieces
+    // Initialize sliding pieces, true for bishop, false for rooks.
     private static void InitSlidersAttacks(bool isBishop){
         for (int square = 0; square < Board.BoardSize * Board.BoardSize; square++){
             BishopMasks[square] = MaskBishopAttacks(square);
@@ -187,8 +185,7 @@ public struct AttackTables{
         }
     }
 
-//======================================== Get Moves from Pieces ========================================//
-    // Gets the moves 
+    // Gets the moves for bishops at a speific square
     public static ulong GetBishopAttacks(int square, ulong occupancy){
         occupancy &= BishopMasks[square];
         occupancy *= Pregen.BishopMagics[square];
@@ -196,6 +193,7 @@ public struct AttackTables{
         return BishopAttacks[square, occupancy];
     }
 
+    // Gets the moves for a rook at a speific square
     public static ulong GetRookAttacks(int square, ulong occupancy){
         occupancy &= RookMasks[square];
         occupancy *= Pregen.RookMagics[square];
