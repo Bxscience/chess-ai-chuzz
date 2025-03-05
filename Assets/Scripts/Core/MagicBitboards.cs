@@ -31,7 +31,7 @@ public struct MagicBitboards{
             ulong magicNumber = Helper.GetBiasedUlong();
             // Initializes the usedAttacks array and sets all values to zero
             for (int i = 0; i < maxLength; i++) usedAttacks[i] = 0ul;
-            // CONFIRM: Unsure if this condition is needed, try method without
+            // WARNING: Unsure if this condition is needed, try method without
             if (Helper.CountBit((attackMask * magicNumber) & 0xFF00000000000000) < 6) continue; 
             int index;
             bool fail;

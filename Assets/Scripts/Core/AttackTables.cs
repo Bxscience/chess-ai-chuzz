@@ -1,5 +1,3 @@
-using UnityEditor.ShaderGraph;
-
 public struct AttackTables{
     // Constants that hold 1's in all positions except the files denoted by the name
     private const ulong _NotAFile = 0x7F7F7F7F7F7F7F7F, 
@@ -19,9 +17,6 @@ public struct AttackTables{
     public readonly static ulong[,] RookAttacks = new ulong[Board.BoardSize * Board.BoardSize, 4096];
     public readonly static ulong[] BishopMasks = new ulong[Board.BoardSize * Board.BoardSize];
     public readonly static ulong[] RookMasks  = new ulong[Board.BoardSize * Board.BoardSize];
-
-    // Holds a bitmap for all squares that are attacked by each side, includes pieces occupied by other white pieces
-    public static ulong[] AttackedSquares = {0ul, 0ul};
 
     // Create Attack Tables
     public static void InitAttackTables(){
@@ -237,41 +232,5 @@ public struct AttackTables{
         if ((GetRookAttacks(square, occupancies[(int)Side.Both]) & (side == Side.White ? bitboards[(int)Piece.WRook] : bitboards[(int)Piece.BRook])) > 0) return true;
         // No checks needed for queens as its covered by bishop & rook
         return false;
-    }
-
-    // Given a board position and a side, generates a bitboard of all attacked squares in the position
-    public static void InitAttackedSquares(ulong[] bitboards, ulong[] occupancies, Side side){
-        int offset = side == Side.White ? 0 : 6;
-        for (int count = offset; count < 6 + offset; count++){
-            ulong board = bitboards[count];
-            int bits = Helper.CountBit(bitboards[count]);
-            for (int iternator = 0; iternator < bits; iternator++){
-                int index = Helper.LSBIndex(board);
-                Helper.PopBit(ref board, index);
-                switch(count){
-                    case 0:
-                        AttackedSquares[(int)side] |= PawnAttacks[(int)side, index];
-                        break;
-                    case 6:
-                        AttackedSquares[(int)side] |= PawnAttacks[(int)side, index];
-                        break;
-                    case 1: case 7:
-                        AttackedSquares[(int)side] |= GetBishopAttacks(index, occupancies[(int)Side.Both]);
-                        break;
-                    case 2: case 8:
-                        AttackedSquares[(int)side] |= KnightAttacks[index];
-                        break;
-                    case 3: case 9:
-                        AttackedSquares[(int)side] |= GetRookAttacks(index, occupancies[(int)Side.Both]);
-                        break;
-                    case 4: case 10:
-                        AttackedSquares[(int)side] |= GetQueenAttacks(index, occupancies[(int)Side.Both]);
-                        break;
-                    case 5: case 11:
-                        AttackedSquares[(int)side] |= KingAttacks[index];
-                        break;
-                }
-            }
-        }
     }
 }
