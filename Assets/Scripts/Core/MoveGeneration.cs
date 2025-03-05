@@ -46,7 +46,10 @@ public struct MoveGeneration{
         for(int index = 0; index < Board.BitboardCount; index++){
             pieceBitboards = board.Bitboards[index];
             if (board.PlayerTurn == Side.White){
-
+                if ((Piece)index == Piece.WPawn){
+                    ulong moves = (board.Occupancies[(int)Side.Both]) ^ (pieceBitboards << 8);
+                    // Above doesn't work
+                }
             }
             else {
 
