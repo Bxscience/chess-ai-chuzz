@@ -1,5 +1,6 @@
 public struct MoveGeneration{
-    private const ulong BRank = 0x000000000000FF00;
+    private const ulong _SecondRank = 0x000000000000FF00;
+    private const ulong _SeventhRank = 0x0000FF000000000;
     // Holds a bitmap for all squares that are attacked by each board, includes pieces occupied by other white pieces
     public static ulong[] AttackedSquares = {0ul, 0ul};
 
@@ -39,7 +40,7 @@ public struct MoveGeneration{
         }
     }
 
-    // TODO: Consider moving source & target to a move struct, figure ou    t pawn pushes
+    // TODO: Consider moving source & target to a move struct, figure out pawn pushes
     public static void GenerateMoves(Board board){
         int source, target;
         ulong pieceBitboards, attacks = 0ul;
@@ -48,14 +49,30 @@ public struct MoveGeneration{
             pieceBitboards = board.Bitboards[index];
             switch((Piece)index){
                 case Piece.WPawn:
-                    ulong Wtemp = ~board.Occupancies[(int)Side.Both] & (pieceBitboards << 8);
+                    ulong Wtemp = ~board.Occupancies[(int)Side.Both] & ((pieceBitboards & _SecondRank) << 8);
                     attacks |= ~board.Occupancies[(int)Side.Both] & (Wtemp << 8);
                     attacks |= ~board.Occupancies[(int)Side.Both] & (pieceBitboards << 8);
+                    int WbitCount = Helper.CountBit(pieceBitboards);
+                    for(int count = 0; count < WbitCount; count++){
+                        int idx = Helper.LSBIndex(pieceBitboards);
+                        Helper.PopBit(ref pieceBitboards, idx);
+                        attacks |= AttackTables.PawnAttacks[(int)board.PlayerTurn, idx] & board.Occupancies[(int)Side.Black];
+                    }
+                    Helper.PrintBitboard(attacks);
                     break;
                 case Piece.BPawn:
-                    ulong Btemp = ~board.Occupancies[(int)Side.Both] & (pieceBitboards >> 8);
+                    ulong Btemp = ~board.Occupancies[(int)Side.Both] & ((pieceBitboards & _SeventhRank) >> 8);
                     attacks |= ~board.Occupancies[(int)Side.Both] & (Btemp >> 8);
                     attacks |= ~board.Occupancies[(int)Side.Both] & (pieceBitboards >> 8);
+                    int BbitCount = Helper.CountBit(pieceBitboards);
+                    for(int count = 0; count < BbitCount; count++){
+                        int idx = Helper.LSBIndex(pieceBitboards);
+                        Helper.PopBit(ref pieceBitboards, idx);
+                        attacks |= AttackTables.PawnAttacks[(int)board.PlayerTurn, idx] & board.Occupancies[(int)Side.Black];
+                    }
+                    Helper.PrintBitboard(attacks);
+                    break;
+                case Piece.BBishop: case Piece.WBishop:
                     break;
             }
         }
