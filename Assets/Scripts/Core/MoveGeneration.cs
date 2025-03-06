@@ -1,4 +1,5 @@
 public struct MoveGeneration{
+    private const ulong BRank = 0x000000000000FF00;
     // Holds a bitmap for all squares that are attacked by each board, includes pieces occupied by other white pieces
     public static ulong[] AttackedSquares = {0ul, 0ul};
 
@@ -38,21 +39,24 @@ public struct MoveGeneration{
         }
     }
 
-    // TODO: Consider moving source & target to a move struct, figure out pawn pushes
+    // TODO: Consider moving source & target to a move struct, figure ou    t pawn pushes
     public static void GenerateMoves(Board board){
         int source, target;
-        ulong pieceBitboards, attacks;
+        ulong pieceBitboards, attacks = 0ul;
 
         for(int index = 0; index < Board.BitboardCount; index++){
             pieceBitboards = board.Bitboards[index];
-            if (board.PlayerTurn == Side.White){
-                if ((Piece)index == Piece.WPawn){
-                    ulong moves = (board.Occupancies[(int)Side.Both]) ^ (pieceBitboards << 8);
-                    // Above doesn't work
-                }
-            }
-            else {
-
+            switch((Piece)index){
+                case Piece.WPawn:
+                    ulong Wtemp = ~board.Occupancies[(int)Side.Both] & (pieceBitboards << 8);
+                    attacks |= ~board.Occupancies[(int)Side.Both] & (Wtemp << 8);
+                    attacks |= ~board.Occupancies[(int)Side.Both] & (pieceBitboards << 8);
+                    break;
+                case Piece.BPawn:
+                    ulong Btemp = ~board.Occupancies[(int)Side.Both] & (pieceBitboards >> 8);
+                    attacks |= ~board.Occupancies[(int)Side.Both] & (Btemp >> 8);
+                    attacks |= ~board.Occupancies[(int)Side.Both] & (pieceBitboards >> 8);
+                    break;
             }
         }
     }
