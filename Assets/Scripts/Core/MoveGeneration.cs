@@ -58,7 +58,6 @@ public struct MoveGeneration{
                         Helper.PopBit(ref pieceBitboards, idx);
                         attacks |= AttackTables.PawnAttacks[(int)board.PlayerTurn, idx] & board.Occupancies[(int)Side.Black];
                     }
-                    Helper.PrintBitboard(attacks);
                     break;
                 case Piece.BPawn:
                     ulong Btemp = ~board.Occupancies[(int)Side.Both] & ((pieceBitboards & _SeventhRank) >> 8);
@@ -70,9 +69,9 @@ public struct MoveGeneration{
                         Helper.PopBit(ref pieceBitboards, idx);
                         attacks |= AttackTables.PawnAttacks[(int)board.PlayerTurn, idx] & board.Occupancies[(int)Side.Black];
                     }
-                    Helper.PrintBitboard(attacks);
                     break;
                 case Piece.BBishop: case Piece.WBishop:
+                
                     break;
             }
         }

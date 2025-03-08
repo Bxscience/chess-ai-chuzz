@@ -7,7 +7,7 @@ public struct Board{
     public const int BoardSize = 8;
     private readonly string _FENPosition;
     public Side PlayerTurn;
-    public int Enpassant;
+    public Square Enpassant;
     public ulong[] Bitboards;
     public ulong[] Occupancies;
 
@@ -16,7 +16,7 @@ public struct Board{
         Occupancies = new ulong[OccupanciesCount];
         _FENPosition = (FEN == "") ? _DefaultPosition : FEN;
         PlayerTurn = Side.White;
-        Enpassant = -1;
+        Enpassant = Square.noSq;
         ParseFENString();
         Occupancies[(int)Side.White] = Bitboards[(int)Piece.WPawn] | Bitboards[(int)Piece.WBishop] | Bitboards[(int)Piece.WKnight] | 
                     Bitboards[(int)Piece.WRook] | Bitboards[(int)Piece.WQueen] | Bitboards[(int)Piece.WKing];
@@ -74,8 +74,8 @@ public struct Board{
         
         // Holds Enpassant Square
         Square result;
-        if (Enum.TryParse(FENPartitions[3], out result)) Enpassant = (int)result;
-        else if (FENPartitions[3][0] == '-') Enpassant = -1;
+        if (Enum.TryParse(FENPartitions[3], out result)) Enpassant = result;
+        else if (FENPartitions[3][0] == '-') Enpassant = Square.noSq;
         else throw new Exception("Invalid FEN String");
 
         // TODO: Half Move Clock
@@ -103,7 +103,7 @@ public enum Square{
     h5, g5, f5, e5, d5, c5, b5, a5,
     h6, g6, f6, e6, d6, c6, b6, a6,
     h7, g7, f7, e7, d7, c7, b7, a7,
-    h8, g8, f8, e8, d8, c8, b8, a8
+    h8, g8, f8, e8, d8, c8, b8, a8, noSq
 
 }
 
