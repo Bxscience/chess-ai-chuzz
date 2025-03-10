@@ -40,7 +40,7 @@ public struct MoveGeneration{
         }
     }
 
-    // TODO: Consider moving source & target to a move struct, figure out pawn pushes
+    // TODO: Consider moving source & target to a move struct
     public static void GenerateMoves(Board board){
         int source, target;
         ulong pieceBitboards, attacks = 0ul;
@@ -113,5 +113,16 @@ public struct MoveGeneration{
                 default: throw new System.Exception("Invalid Piece!");
             }
         }
+    }
+}
+
+// Move struct to handle making & unmaking moves
+public struct Move{
+    int src, dest;
+    Piece piece;
+    public Move(int src, int dest, Piece piece){
+        this.src = src;
+        this.dest = dest;
+        this.piece = piece;
     }
 }
