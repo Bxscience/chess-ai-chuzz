@@ -47,7 +47,7 @@ public struct MoveGeneration{
 
         for(int index = 0; index < Board.BitboardCount; index++){
             pieceBitboards = board.Bitboards[index];
-            switch((Piece)index){
+            switch((Piece)index){   
                 case Piece.WPawn:
                     ulong Wtemp = ~board.Occupancies[(int)Side.Both] & ((pieceBitboards & _SecondRank) << 8);
                     attacks |= ~board.Occupancies[(int)Side.Both] & (Wtemp << 8);
@@ -71,8 +71,46 @@ public struct MoveGeneration{
                     }
                     break;
                 case Piece.BBishop: case Piece.WBishop:
-                
+                    int BishopBitCount = Helper.CountBit(pieceBitboards);
+                    for (int count = 0; count < BishopBitCount; count++){
+                        int idx = Helper.LSBIndex(pieceBitboards);
+                        Helper.PopBit(ref pieceBitboards, idx);
+                        attacks |= AttackTables.GetBishopAttacks(idx, board.Occupancies[(int)Side.Both]);
+                    }
                     break;
+                case Piece.WKnight: case Piece.BKnight:
+                    int KnightBitCount = Helper.CountBit(pieceBitboards);
+                    for (int count = 0; count < KnightBitCount; count++){
+                        int idx = Helper.LSBIndex(pieceBitboards);
+                        Helper.PopBit(ref pieceBitboards, idx);
+                        attacks |= AttackTables.KnightAttacks[idx];
+                    }
+                    break;
+                case Piece.WRook: case Piece.BRook:
+                    int RookBitCount = Helper.CountBit(pieceBitboards);
+                    for (int count = 0; count < RookBitCount; count++){
+                        int idx = Helper.LSBIndex(pieceBitboards);
+                        Helper.PopBit(ref pieceBitboards, idx);
+                        attacks |= AttackTables.GetRookAttacks(idx, board.Occupancies[(int)Side.Both]);
+                    }
+                    break;
+                case Piece.WQueen: case Piece.BQueen:
+                    int QueenBitCount = Helper.CountBit(pieceBitboards);
+                    for (int count = 0; count < QueenBitCount; count++){
+                        int idx = Helper.LSBIndex(pieceBitboards);
+                        Helper.PopBit(ref pieceBitboards, idx);
+                        attacks |= AttackTables.GetQueenAttacks(idx, board.Occupancies[(int)Side.Both]);
+                    }
+                    break;
+                case Piece.WKing: case Piece.BKing:
+                    int KingBitCount = Helper.CountBit(pieceBitboards);
+                    for (int count = 0; count < KingBitCount; count++){
+                        int idx = Helper.LSBIndex(pieceBitboards);
+                        Helper.PopBit(ref pieceBitboards, idx);
+                        attacks |= AttackTables.KingAttacks[idx];
+                    }
+                    break;
+                default: throw new System.Exception("Invalid Piece!");
             }
         }
     }
