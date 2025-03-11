@@ -1,6 +1,12 @@
 public struct MoveGeneration{
+    // A ulong containing only the second rank bits on
     private const ulong _SecondRank = 0x000000000000FF00;
+    // A ulong containing only the seventh rank bits on
     private const ulong _SeventhRank = 0x0000FF000000000;
+    // A ulong holding the available castling for white side king
+    private const ulong _WKing = 1001ul;
+    // A ulong holding the available castling for white side queen
+    private const ulong _WQueen = 10001000ul;
     // Holds a bitmap for all squares that are attacked by each board, includes pieces occupied by other white pieces
     public static ulong[] AttackedSquares = {0ul, 0ul};
 
@@ -119,10 +125,11 @@ public struct MoveGeneration{
 // Move struct to handle making & unmaking moves
 public struct Move{
     int src, dest;
-    Piece piece;
-    public Move(int src, int dest, Piece piece){
+    Piece piece, capturePiece;
+    public Move(int src, int dest, Piece piece, Piece capturePiece){
         this.src = src;
         this.dest = dest;
         this.piece = piece;
+        this.capturePiece = capturePiece;
     }
 }

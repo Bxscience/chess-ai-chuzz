@@ -188,7 +188,7 @@ public struct AttackTables{
                     ulong occupancy = SetOccupancy(index, relevantbits, attackMask);
                     int magicIndex = (int)((occupancy * Pregen.RookMagics[square]) >> (64 - relevantbits));
                     RookAttacks[square, magicIndex] = GenerateRookAttacks(square, occupancy);
-                }
+                }   
             }
         }
     }
