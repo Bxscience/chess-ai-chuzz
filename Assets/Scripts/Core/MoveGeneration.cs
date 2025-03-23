@@ -59,45 +59,117 @@ public struct MoveGeneration{
     private const ulong _SecondRank = 0x000000000000FF00, _SeventhRank = 0x0000FF000000000;
     
     // A ulong holding the available castling for all sides
-    private static ulong _WKing = 0x9, _WQueen = 0x88, _BKing = 0x900000000000000 , _BQueen = 0x8800000000000000;
+    //private static ulong _WKing = 0x9, _WQueen = 0x88, _BKing = 0x900000000000000 , _BQueen = 0x8800000000000000;
 
     // Holds a bitmap for all squares that are attacked by each board, includes pieces occupied by other white pieces
     public static ulong[] AttackedSquares = {0ul, 0ul};
 
     // Given a board struct, generates a bitboard of all attacked squares in the position
-    public static void InitAttackedSquares(Board board){
-        int offset = board.PlayerTurn == Side.White ? 0 : 6;
-        for (int count = offset; count < 6 + offset; count++){
-            ulong bitboard = board.Bitboards[count];
+    public static void InitAttackMap(Board board){
+        for (int piece = 0; piece < Board.BitboardCount; piece++){
+            int side = piece / 6;
+            ulong bitboard = board.Bitboards[piece];
             int bits = Helper.CountBit(bitboard);
             for (int iternator = 0; iternator < bits; iternator++){
-                int index = Helper.LSBIndex(bitboard);
-                Helper.PopBit(ref bitboard, index);
-                switch(count){
+                int srcSquare = Helper.LSBIndex(bitboard);
+                Helper.PopBit(ref bitboard, srcSquare);
+                switch(piece){
                     case 0:
-                        AttackedSquares[(int)board.PlayerTurn] |= AttackTables.PawnAttacks[(int)board.PlayerTurn, index];
+                        AttackedSquares[side] |= AttackTables.PawnAttacks[side, srcSquare];
                         break;
                     case 6:
-                        AttackedSquares[(int)board.PlayerTurn] |= AttackTables.PawnAttacks[(int)board.PlayerTurn, index];
+                        AttackedSquares[side] |= AttackTables.PawnAttacks[side, srcSquare];
                         break;
                     case 1: case 7:
-                        AttackedSquares[(int)board.PlayerTurn] |= AttackTables.GetBishopAttacks(index, board.Occupancies[(int)Side.Both]);
+                        AttackedSquares[side] |= AttackTables.GetBishopAttacks(srcSquare, board.Occupancies[(int)Side.Both]);
                         break;
                     case 2: case 8:
-                        AttackedSquares[(int)board.PlayerTurn] |= AttackTables.KnightAttacks[index];
+                        AttackedSquares[side] |= AttackTables.KnightAttacks[srcSquare];
                         break;
                     case 3: case 9:
-                        AttackedSquares[(int)board.PlayerTurn] |= AttackTables.GetRookAttacks(index, board.Occupancies[(int)Side.Both]);
+                        AttackedSquares[side] |= AttackTables.GetRookAttacks(srcSquare, board.Occupancies[(int)Side.Both]);
                         break;
                     case 4: case 10:
-                        AttackedSquares[(int)board.PlayerTurn] |= AttackTables.GetQueenAttacks(index, board.Occupancies[(int)Side.Both]);
+                        AttackedSquares[side] |= AttackTables.GetQueenAttacks(srcSquare, board.Occupancies[(int)Side.Both]);
                         break;
                     case 5: case 11:
-                        AttackedSquares[(int)board.PlayerTurn] |= AttackTables.KingAttacks[index];
+                        AttackedSquares[side] |= AttackTables.KingAttacks[srcSquare];
                         break;
                 }
             }
         }
+    }
+
+    // Updates attack map based on new information from move
+    public static void UpdateAttackMap(int move){}
+
+    // Creates an int array storing possible moves
+    public static int[] InitMoves(Board board, Side side){
+        int[] moveList = new int[256];
+        int moveIndex = 0;
+        if (IsInCheck(board, side)){
+            //WIP, need to generate moves when under check
+            return moveList;
+        }
+        int offset = side == 0 ? 6 : 0;
+        for (int piece = offset; piece < 6 + offset; piece++){
+            ulong pieceBitboard = board.Bitboards[piece];
+            int bits = Helper.CountBit(pieceBitboard);
+            for (int count = 0; count < bits; count++){
+                ulong attacks;
+                int possibleAttacks;
+                int src = Helper.LSBIndex(pieceBitboard);
+                Helper.PopBit(ref pieceBitboard, src);
+                switch ((Piece)piece){
+                    case Piece.WPawn:
+                        break;
+                    case Piece.BPawn:
+                        break;
+                    case Piece.BBishop: case Piece.WBishop:
+                        attacks = AttackTables.GetBishopAttacks(src, board.Occupancies[(int)Side.Both]);
+                        possibleAttacks = Helper.CountBit(attacks);
+                        for (int iternator = 0; iternator < possibleAttacks; iternator++){
+                            int dest = Helper.LSBIndex(attacks);
+                            Helper.PopBit(ref attacks, dest);
+                            if (!Helper.CheckBit(board.Occupancies[(int)Side.White], attacks, dest))
+                                continue;
+                            int move = Move.EncodeMove(src, dest, 
+                                            (Piece)piece, Piece.noPiece, 
+                                            Helper.GetBit(board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)], dest) == 1, false, 
+                                            false, false);
+                            moveList[moveIndex++] = move;
+                        }
+                        break;
+                    case Piece.BKnight: case Piece.WKnight:
+                        attacks = AttackTables.KnightAttacks[src];
+                        possibleAttacks = Helper.CountBit(attacks);
+                        for (int iternator = 0; iternator < possibleAttacks; iternator++){
+                            int dest = Helper.LSBIndex(attacks);
+                            Helper.PopBit(ref attacks, dest);
+                            if (!Helper.CheckBit(board.Occupancies[(int)Side.White], attacks, dest))
+                                continue;
+                            int move = Move.EncodeMove(src, dest, 
+                                            (Piece)piece, Piece.noPiece, 
+                                            Helper.GetBit(board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)], dest) == 1, false, 
+                                            false, false);
+                            moveList[moveIndex++] = move;
+                        }
+                        break;
+                    case Piece.BQueen: case Piece.WQueen:
+                        break;
+                    case Piece.BKing: case Piece.WKing:
+                        break;
+                }
+            }
+        }
+        return moveList;
+    }
+
+    // Checks whether the given side is in check
+    public static bool IsInCheck(Board board, Side side){
+        ulong kingBitboard = board.Bitboards[(int)(side == Side.Black ? Piece.BKing : Piece.WKing)];
+        int index = Helper.LSBIndex(kingBitboard);
+        return Helper.CheckBit(kingBitboard, AttackedSquares[(int)(side == Side.Black ? Side.White : Side.Black)], index);
     }
 
     // Generates a attack bitboard that holds all attacked squares given a board struct
