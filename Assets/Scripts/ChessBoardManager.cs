@@ -7,6 +7,10 @@ public class ChessBoardManager : MonoBehaviour{
         Chessboard = new Board("8/8/1Q6/4P3/4PP2/1N6/6B1/3KR3 w - - 0 1");
         AttackTables.InitAttackTables();
         Chessboard.TestBoard();
-        MoveGeneration.GenerateMoves(Chessboard);
+        MoveGeneration.InitAttackedSquares(Chessboard);
+        Helper.PrintBitboard(MoveGeneration.AttackedSquares[(int)Side.White]);
+        MoveGeneration.GenerateAttackMap(Chessboard);
+        int move = Move.EncodeMove((int)Square.h1, (int)Square.h2, Piece.BKing, Piece.WPawn, true, false, true, false);
+        Move.PrintMove(move);
     }
 }

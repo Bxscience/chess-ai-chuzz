@@ -1,3 +1,59 @@
+/* Encoding Moves in a integer:                                             Hexadecimal to decode values:
+0000 0000 0000 0000 0011 1111       src square (6 bits)                     0x3f
+0000 0000 0000 1111 1100 0000       dest square (6 bits)                    0xfc0
+0000 0000 1111 0000 0000 0000       piece (4 bits)                          0xf000
+0000 1111 0000 0000 0000 0000       promoted piece (4 bits)                 0xf0000
+0001 0000 0000 0000 0000 0000       capture flag (1 bit)                    0x100000
+0010 0000 0000 0000 0000 0000       double push flag (1 bit)                0x200000
+0100 0000 0000 0000 0000 0000       enpassant flag (1 bit)                  0x400000
+1000 0000 0000 0000 0000 0000       castling flag (1 bit)                   0x800000
+*/
+public struct Move{
+    // Converts moves on the board to binary for easier handling
+    public static int EncodeMove(int src, int dest, Piece piece, Piece promotedPiece, bool capture, bool doublePush, bool enpassant, bool castling){
+        int move = 0;
+        move |= src;
+        move |= dest << 6;
+        move |= (int)piece << 12;
+        move |= (int)promotedPiece << 16;
+        move |= (capture ? 1 : 0) << 20;
+        move |= (doublePush ? 1 : 0) << 21;
+        move |= (enpassant ? 1 : 0) << 22;
+        move |= (castling ? 1 : 0) << 23;
+        return move;
+    }
+    // Gets the source square of the move
+    public static int GetSrcSquare(int move) => move & 0x3f;
+    // Gets the destination square of the move
+    public static int GetDestSquare(int move) => (move & 0xfc0) >> 6;
+    // Gets the piece that moved
+    public static Piece GetPiece(int move) => (Piece)((move & 0xf000) >> 12);
+    // Gets the piece that promoted
+    public static Piece GetPromotedPiece(int move) => (Piece)((move & 0xf0000) >> 16);
+    // If the move is a capture
+    public static bool IsCapture(int move) => (move & 0x100000) >> 20 == 1;
+    // If the move is a double pawn push
+    public static bool IsPush(int move) => (move & 0x200000) >> 21 == 1;
+    // If the move is a enpassant move
+    public static bool IsEnpassant(int move) => (move & 0x400000) >> 22 == 1;
+    // If the move is a castling move
+    public static bool IsCastle(int move) => (move & 0x800000) >> 23 == 1;
+
+    // Helper function that prints out the move in a human readable way
+    public static void PrintMove(int move){
+        string output = "";
+        output += "Src Square: " +  (Square)GetSrcSquare(move) + "\n";
+        output += "Dest Square: " + (Square)GetDestSquare(move) + "\n";
+        output += "Piece Moved: " + GetPiece(move) + "\n";
+        output += "Promoted Piece: " + GetPromotedPiece(move) + "\n";
+        output += "Capture Move?: " + IsCapture(move) + "\n";
+        output += "Is Double Push?: " + IsPush(move) + "\n";
+        output += "Is Enpassant?: " + IsEnpassant(move) + "\n";
+        output += "Is Castling?: " + IsCastle(move) + "\n";
+        UnityEngine.Debug.Log(output);
+    }
+}
+
 public struct MoveGeneration{
     // A constant ulong for ranks
     private const ulong _SecondRank = 0x000000000000FF00, _SeventhRank = 0x0000FF000000000;
@@ -44,15 +100,16 @@ public struct MoveGeneration{
         }
     }
 
-    // 
+    // Generates a attack bitboard that holds all attacked squares given a board struct
+    /*
     public static void GenerateAttackMap(Board board){
         ulong pieceBitboards, attacks = 0ul;    
         for(int index = 0; index < Board.BitboardCount; index++){
             pieceBitboards = board.Bitboards[index];
             switch((Piece)index){   
                 case Piece.WPawn:
-                    ulong Wtemp = ~board.Occupancies[(int)Side.Both] & ((pieceBitboards & _SecondRank) << 8);
-                    attacks |= ~board.Occupancies[(int)Side.Both] & (Wtemp << 8);
+                    ulong doublePushPawns = ~board.Occupancies[(int)Side.Both] & ((pieceBitboards & _SecondRank) << 8);
+                    attacks |= ~board.Occupancies[(int)Side.Both] & (doublePushPawns << 8);
                     attacks |= ~board.Occupancies[(int)Side.Both] & (pieceBitboards << 8);
                     int WbitCount = Helper.CountBit(pieceBitboards);
                     for(int count = 0; count < WbitCount; count++){
@@ -119,21 +176,7 @@ public struct MoveGeneration{
     
     // TODO: Update the Attack Maps based on the move passed in
     public static void UpdateAttackMaps(Move move){
-        switch(move.piece){
-            
-        }
     }
+    */
 }
 
-
-// Move struct to handle making & unmaking moves
-public struct Move{
-    public int src, dest;
-    public Piece piece, capturePiece;
-    public Move(int src, int dest, Piece piece, Piece capturePiece){
-        this.src = src;
-        this.dest = dest;
-        this.piece = piece;
-        this.capturePiece = capturePiece;
-    }
-}
