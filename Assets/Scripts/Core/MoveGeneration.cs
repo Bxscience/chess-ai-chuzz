@@ -1,12 +1,10 @@
 public struct MoveGeneration{
-    // A ulong containing only the second rank bits on
-    private const ulong _SecondRank = 0x000000000000FF00;
-    // A ulong containing only the seventh rank bits on
-    private const ulong _SeventhRank = 0x0000FF000000000;
-    // A ulong holding the available castling for white side king
-    private const ulong _WKing = 1001ul;
-    // A ulong holding the available castling for white side queen
-    private const ulong _WQueen = 10001000ul;
+    // A constant ulong for ranks
+    private const ulong _SecondRank = 0x000000000000FF00, _SeventhRank = 0x0000FF000000000;
+    
+    // A ulong holding the available castling for all sides
+    private static ulong _WKing = 0x9, _WQueen = 0x88, _BKing = 0x900000000000000 , _BQueen = 0x8800000000000000;
+
     // Holds a bitmap for all squares that are attacked by each board, includes pieces occupied by other white pieces
     public static ulong[] AttackedSquares = {0ul, 0ul};
 
@@ -46,11 +44,9 @@ public struct MoveGeneration{
         }
     }
 
-    // TODO: Consider moving source & target to a move struct
-    public static void GenerateMoves(Board board){
-        int source, target;
-        ulong pieceBitboards, attacks = 0ul;
-
+    // 
+    public static void GenerateAttackMap(Board board){
+        ulong pieceBitboards, attacks = 0ul;    
         for(int index = 0; index < Board.BitboardCount; index++){
             pieceBitboards = board.Bitboards[index];
             switch((Piece)index){   
@@ -120,12 +116,20 @@ public struct MoveGeneration{
             }
         }
     }
+    
+    // TODO: Update the Attack Maps based on the move passed in
+    public static void UpdateAttackMaps(Move move){
+        switch(move.piece){
+            
+        }
+    }
 }
+
 
 // Move struct to handle making & unmaking moves
 public struct Move{
-    int src, dest;
-    Piece piece, capturePiece;
+    public int src, dest;
+    public Piece piece, capturePiece;
     public Move(int src, int dest, Piece piece, Piece capturePiece){
         this.src = src;
         this.dest = dest;

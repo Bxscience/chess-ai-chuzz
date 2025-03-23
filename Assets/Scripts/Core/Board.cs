@@ -10,6 +10,7 @@ public struct Board{
     public Square Enpassant;
     public ulong[] Bitboards;
     public ulong[] Occupancies;
+    public CastlingRights Rights;
 
     public Board(string FEN){
         Bitboards = new ulong[BitboardCount];
@@ -17,6 +18,7 @@ public struct Board{
         _FENPosition = (FEN == "") ? _DefaultPosition : FEN;
         PlayerTurn = Side.White;
         Enpassant = Square.noSq;
+        Rights = 0;
         ParseFENString();
         Occupancies[(int)Side.White] = Bitboards[(int)Piece.WPawn] | Bitboards[(int)Piece.WBishop] | Bitboards[(int)Piece.WKnight] | 
                     Bitboards[(int)Piece.WRook] | Bitboards[(int)Piece.WQueen] | Bitboards[(int)Piece.WKing];
@@ -86,7 +88,7 @@ public struct Board{
 // Enum to store index of bitboards
 public enum Piece{
     WPawn, WBishop, WKnight, WRook, WQueen, WKing,
-    BPawn, BBishop, BKnight, BRook, BQueen, BKing
+    BPawn, BBishop, BKnight, BRook, BQueen, BKing, noPiece
 }
 
 // Enum for side to move
