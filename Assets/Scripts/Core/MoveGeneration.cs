@@ -119,7 +119,7 @@ public struct MoveGeneration{
             int bits = Helper.CountBit(pieceBitboard);
             for (int count = 0; count < bits; count++){
                 ulong attacks;
-                int possibleAttacks;
+                int possibleAttacks, enpassant;
                 int src = Helper.LSBIndex(pieceBitboard);
                 Helper.PopBit(ref pieceBitboard, src);
                 switch ((Piece)piece){
@@ -195,6 +195,15 @@ public struct MoveGeneration{
                                 moveList[moveIndex++] = moves;                
                             }
                         }
+
+                        // Enpassants for the white side (If black did a double pawn push, then white can enpassant)
+                        enpassant = (int)board.Enpassant;
+                        if (board.PlayerTurn == Side.White && (src << 7 == enpassant || src << 9 == enpassant)){
+                            int moves = Move.EncodeMove(src, enpassant,
+                                            (Piece)piece, Piece.noPiece,
+                                            true, false, true, false);
+                            moveList[moveIndex++] = moves;
+                        }
                         break;
                     case Piece.BPawn:
                         // Checking whether the pawn is on a promotion square, if so then adds promotion moves
@@ -267,6 +276,14 @@ public struct MoveGeneration{
 
                                 moveList[moveIndex++] = moves;                
                             }
+                        }
+                        // Enpassants for the white side (If black did a double pawn push, then white can enpassant)
+                        enpassant = (int)board.Enpassant;
+                        if (board.PlayerTurn == Side.White && (src >> 7 == enpassant || src >> 9 == enpassant)){
+                            int moves = Move.EncodeMove(src, enpassant,
+                                            (Piece)piece, Piece.noPiece,
+                                            true, false, true, false);
+                            moveList[moveIndex++] = moves;
                         }
                         break;
                     case Piece.BBishop: case Piece.WBishop:
