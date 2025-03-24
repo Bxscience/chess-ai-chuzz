@@ -7,6 +7,7 @@
 0010 0000 0000 0000 0000 0000       double push flag (1 bit)                0x200000
 0100 0000 0000 0000 0000 0000       enpassant flag (1 bit)                  0x400000
 1000 0000 0000 0000 0000 0000       castling flag (1 bit)                   0x800000
+when move == 0, the move is null
 */
 public struct Move{
     // Converts moves on the board to binary for easier handling
@@ -56,7 +57,7 @@ public struct Move{
 
 public struct MoveGeneration{
     // A constant ulong for ranks
-    private const ulong _SecondRank = 0x000000000000FF00, _SeventhRank = 0x0000FF000000000;
+    private const ulong _SecondRank = 0xFF00, _SeventhRank = 0xFF000000000000;
     
     // A ulong holding the available castling for all sides
     //private static ulong _WKing = 0x9, _WQueen = 0x88, _BKing = 0x900000000000000 , _BQueen = 0x8800000000000000;
@@ -103,15 +104,16 @@ public struct MoveGeneration{
     // Updates attack map based on new information from move
     public static void UpdateAttackMap(int move){}
 
-    // Creates an int array storing possible moves
+    // Creates an int array storing possible moves while determining legal moves
+    // TODO: Pawns need to do enpassant moves!!
     public static int[] InitMoves(Board board, Side side){
         int[] moveList = new int[256];
         int moveIndex = 0;
         if (IsInCheck(board, side)){
-            //WIP, need to generate moves when under check
+            //TODO: generate moves when under check
             return moveList;
         }
-        int offset = side == 0 ? 6 : 0;
+        int offset = side == Side.Black ? 6 : 0;
         for (int piece = offset; piece < 6 + offset; piece++){
             ulong pieceBitboard = board.Bitboards[piece];
             int bits = Helper.CountBit(pieceBitboard);
@@ -122,8 +124,150 @@ public struct MoveGeneration{
                 Helper.PopBit(ref pieceBitboard, src);
                 switch ((Piece)piece){
                     case Piece.WPawn:
+                        // Checking whether the pawn is on a promotion square, if so then adds promotion moves
+                        if (Helper.CheckBit(1ul << src, _SeventhRank, src)){
+                            int dest = src + 8;
+                            int moves = Move.EncodeMove(src, dest,
+                                           (Piece)piece, Piece.WQueen,
+                                           false, false, false, false);
+                            moveList[moveIndex++] = moves;
+                            moves = Move.EncodeMove(src, dest,
+                                           (Piece)piece, Piece.WRook,
+                                           false, false, false, false);
+                            moveList[moveIndex++] = moves;
+                            moves = Move.EncodeMove(src, dest,
+                                           (Piece)piece, Piece.WBishop,
+                                           false, false, false, false);
+                            moveList[moveIndex++] = moves;
+                            moves = Move.EncodeMove(src, dest,
+                                           (Piece)piece, Piece.WKnight,
+                                           false, false, false, false);
+                            moveList[moveIndex++] = moves;
+                        }
+                        // Handles single pawn pushes
+                        else if (Helper.GetBit(board.Occupancies[(int)Side.Both], src + 8) == 0){
+                            int wMove = Move.EncodeMove(src, src + 8,
+                                            (Piece)piece, Piece.noPiece,
+                                            false, false, false, false);   
+                            Move.PrintMove(wMove);
+                            moveList[moveIndex++] = wMove;
+                            // Handles double pawn pushes
+                            if (Helper.CheckBit(1ul << src, _SecondRank, src) && Helper.GetBit(board.Occupancies[(int)Side.Both], src + 16) == 0){
+                                    int move = Move.EncodeMove(src, src + 16,
+                                                    (Piece)piece, Piece.noPiece,
+                                                    false, true, false, false);
+                                    moveList[moveIndex++] = move;
+                            }
+                        }
+
+                        // Handles pawn captures
+                        attacks = AttackTables.PawnAttacks[(int)side, src] & board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)];
+                        possibleAttacks = Helper.CountBit(attacks);
+                        for (int iternator = 0; iternator < possibleAttacks; iternator++){
+                            int dest = Helper.LSBIndex(attacks);
+                            Helper.PopBit(ref attacks, dest);
+                            if (Helper.CheckBit(1ul << src, _SeventhRank, src)){
+                                int moves = Move.EncodeMove(src, dest,
+                                            (Piece)piece, Piece.WQueen,
+                                            true, false, false, false);
+
+                                moveList[moveIndex++] = moves;
+                                moves = Move.EncodeMove(src, dest,
+                                            (Piece)piece, Piece.WRook,
+                                            true, false, false, false);
+
+                                moveList[moveIndex++] = moves;
+                                moves = Move.EncodeMove(src, dest,
+                                            (Piece)piece, Piece.WBishop,
+                                            true, false, false, false);
+
+                                moveList[moveIndex++] = moves;
+                                moves = Move.EncodeMove(src, dest,
+                                            (Piece)piece, Piece.WKnight,
+                                            true, false, false, false);
+
+                                moveList[moveIndex++] = moves;
+                            } else {
+                                int moves = Move.EncodeMove(src, dest,
+                                                (Piece)piece, Piece.noPiece,
+                                                true, false, false, false);
+
+                                moveList[moveIndex++] = moves;                
+                            }
+                        }
                         break;
                     case Piece.BPawn:
+                        // Checking whether the pawn is on a promotion square, if so then adds promotion moves
+                        if (Helper.CheckBit(1ul << src, _SecondRank, src)){
+                            int dest = src - 8;
+                            int moves = Move.EncodeMove(src, dest,
+                                           (Piece)piece, Piece.BQueen,
+                                           false, false, false, false);
+                            moveList[moveIndex++] = moves;
+                            moves = Move.EncodeMove(src, dest,
+                                           (Piece)piece, Piece.BRook,
+                                           false, false, false, false);
+                            moveList[moveIndex++] = moves;
+                            moves = Move.EncodeMove(src, dest,
+                                           (Piece)piece, Piece.BBishop,
+                                           false, false, false, false);
+                            moveList[moveIndex++] = moves;
+                            moves = Move.EncodeMove(src, dest,
+                                           (Piece)piece, Piece.BKnight,
+                                           false, false, false, false);
+                            moveList[moveIndex++] = moves;
+                        }
+                        // Handles single pawn pushes
+                        else if (Helper.GetBit(board.Occupancies[(int)Side.Both], src - 8) == 0){
+                            int bMove = Move.EncodeMove(src, src - 8,
+                                            (Piece)piece, Piece.noPiece,
+                                            false, false, false, false);   
+                            Move.PrintMove(bMove);
+                            moveList[moveIndex++] = bMove;
+                            // Handles double pawn pushes
+                            if (Helper.CheckBit(1ul << src, _SeventhRank, src) && Helper.GetBit(board.Occupancies[(int)Side.Both], src - 16) == 0){
+                                    int move = Move.EncodeMove(src, src - 16,
+                                                    (Piece)piece, Piece.noPiece,
+                                                    false, true, false, false);
+                                    moveList[moveIndex++] = move;
+                            }
+                        }
+
+                        // Handles pawn captures
+                        attacks = AttackTables.PawnAttacks[(int)side, src] & board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)];
+                        possibleAttacks = Helper.CountBit(attacks);
+                        for (int iternator = 0; iternator < possibleAttacks; iternator++){
+                            int dest = Helper.LSBIndex(attacks);
+                            Helper.PopBit(ref attacks, dest);
+                            if (Helper.CheckBit(1ul << src, _SecondRank, src)){
+                                int moves = Move.EncodeMove(src, dest,
+                                            (Piece)piece, Piece.BQueen,
+                                            true, false, false, false);
+
+                                moveList[moveIndex++] = moves;
+                                moves = Move.EncodeMove(src, dest,
+                                            (Piece)piece, Piece.BRook,
+                                            true, false, false, false);
+
+                                moveList[moveIndex++] = moves;
+                                moves = Move.EncodeMove(src, dest,
+                                            (Piece)piece, Piece.BBishop,
+                                            true, false, false, false);
+
+                                moveList[moveIndex++] = moves;
+                                moves = Move.EncodeMove(src, dest,
+                                            (Piece)piece, Piece.BKnight,
+                                            true, false, false, false);
+
+                                moveList[moveIndex++] = moves;
+                            } else {
+                                int moves = Move.EncodeMove(src, dest,
+                                                (Piece)piece, Piece.noPiece,
+                                                true, false, false, false);
+
+                                moveList[moveIndex++] = moves;                
+                            }
+                        }
                         break;
                     case Piece.BBishop: case Piece.WBishop:
                         attacks = AttackTables.GetBishopAttacks(src, board.Occupancies[(int)Side.Both]);
@@ -131,7 +275,7 @@ public struct MoveGeneration{
                         for (int iternator = 0; iternator < possibleAttacks; iternator++){
                             int dest = Helper.LSBIndex(attacks);
                             Helper.PopBit(ref attacks, dest);
-                            if (!Helper.CheckBit(board.Occupancies[(int)Side.White], attacks, dest))
+                            if (!Helper.CheckBit(board.Occupancies[(int)side], attacks, dest))
                                 continue;
                             int move = Move.EncodeMove(src, dest, 
                                             (Piece)piece, Piece.noPiece, 
@@ -146,7 +290,7 @@ public struct MoveGeneration{
                         for (int iternator = 0; iternator < possibleAttacks; iternator++){
                             int dest = Helper.LSBIndex(attacks);
                             Helper.PopBit(ref attacks, dest);
-                            if (!Helper.CheckBit(board.Occupancies[(int)Side.White], attacks, dest))
+                            if (!Helper.CheckBit(board.Occupancies[(int)side], attacks, dest))
                                 continue;
                             int move = Move.EncodeMove(src, dest, 
                                             (Piece)piece, Piece.noPiece, 
@@ -156,8 +300,35 @@ public struct MoveGeneration{
                         }
                         break;
                     case Piece.BQueen: case Piece.WQueen:
+                        attacks = AttackTables.GetQueenAttacks(src, board.Occupancies[(int)Side.Both]);
+                        possibleAttacks = Helper.CountBit(attacks);
+                        for (int iternator = 0; iternator < possibleAttacks; iternator++){
+                            int dest = Helper.LSBIndex(attacks);
+                            Helper.PopBit(ref attacks, dest);
+                            if (!Helper.CheckBit(board.Occupancies[(int)side], attacks, dest))
+                                continue;
+                            int move = Move.EncodeMove(src, dest, 
+                                            (Piece)piece, Piece.noPiece, 
+                                            Helper.GetBit(board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)], dest) == 1, false, 
+                                            false, false);
+                            moveList[moveIndex++] = move;
+                        }
                         break;
                     case Piece.BKing: case Piece.WKing:
+                        // TODO: Implement Castling Moves
+                        attacks = AttackTables.KingAttacks[src];
+                        possibleAttacks = Helper.CountBit(attacks);
+                        for (int iternator = 0; iternator < possibleAttacks; iternator++){
+                            int dest = Helper.LSBIndex(attacks);
+                            Helper.PopBit(ref attacks, dest);
+                            if (!Helper.CheckBit(board.Occupancies[(int)side], attacks, dest))
+                                continue;
+                            int move = Move.EncodeMove(src, dest, 
+                                            (Piece)piece, Piece.noPiece, 
+                                            Helper.GetBit(board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)], dest) == 1, false, 
+                                            false, false);
+                            moveList[moveIndex++] = move;
+                        }
                         break;
                 }
             }
@@ -168,6 +339,7 @@ public struct MoveGeneration{
     // Checks whether the given side is in check
     public static bool IsInCheck(Board board, Side side){
         ulong kingBitboard = board.Bitboards[(int)(side == Side.Black ? Piece.BKing : Piece.WKing)];
+        if (kingBitboard == 0) return false;
         int index = Helper.LSBIndex(kingBitboard);
         return Helper.CheckBit(kingBitboard, AttackedSquares[(int)(side == Side.Black ? Side.White : Side.Black)], index);
     }
