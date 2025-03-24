@@ -67,11 +67,12 @@ public struct Helper{
     // Returns a ulong with a bias towards zero bits
     public static ulong GetBiasedUlong() => GetRandomUlong() & GetRandomUlong() & GetRandomUlong();
 
+    // Returns the opponents side enum, provided the player's enum
+    public static Side GetOpponent(Side side) => side == Side.White ? Side.Black : Side.White;
+
 //======================================== Input ========================================//
     // Places the inputted piece on the given square
-    public static void PlacePiece(Board board, Piece piece, Square square) => SetBit(ref board.Bitboards[(int)piece], (int)square);
-
-    
+    public static void PlacePiece(Board board, Piece piece, Square square) => SetBit(ref board.Bitboards[(int)piece], (int)square);    
 
 //======================================== Output ========================================//
     // Prints out the bitboard in a human-friendly way

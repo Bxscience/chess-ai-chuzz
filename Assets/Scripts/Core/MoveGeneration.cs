@@ -161,7 +161,7 @@ public struct MoveGeneration{
                         }
 
                         // Handles pawn captures
-                        attacks = AttackTables.PawnAttacks[(int)side, src] & board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)];
+                        attacks = AttackTables.PawnAttacks[(int)side, src] & board.Occupancies[(int)Helper.GetOpponent(side)];
                         possibleAttacks = Helper.CountBit(attacks);
                         for (int iternator = 0; iternator < possibleAttacks; iternator++){
                             int dest = Helper.LSBIndex(attacks);
@@ -234,7 +234,7 @@ public struct MoveGeneration{
                         }
 
                         // Handles pawn captures
-                        attacks = AttackTables.PawnAttacks[(int)side, src] & board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)];
+                        attacks = AttackTables.PawnAttacks[(int)side, src] & board.Occupancies[(int)Helper.GetOpponent(side)];
                         possibleAttacks = Helper.CountBit(attacks);
                         for (int iternator = 0; iternator < possibleAttacks; iternator++){
                             int dest = Helper.LSBIndex(attacks);
@@ -279,7 +279,7 @@ public struct MoveGeneration{
                                 continue;
                             int move = Move.EncodeMove(src, dest, 
                                             (Piece)piece, Piece.noPiece, 
-                                            Helper.GetBit(board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)], dest) == 1, false, 
+                                            Helper.GetBit(board.Occupancies[(int)Helper.GetOpponent(side)], dest) == 1, false, 
                                             false, false);
                             moveList[moveIndex++] = move;
                         }
@@ -294,7 +294,7 @@ public struct MoveGeneration{
                                 continue;
                             int move = Move.EncodeMove(src, dest, 
                                             (Piece)piece, Piece.noPiece, 
-                                            Helper.GetBit(board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)], dest) == 1, false, 
+                                            Helper.GetBit(board.Occupancies[(int)Helper.GetOpponent(side)], dest) == 1, false, 
                                             false, false);
                             moveList[moveIndex++] = move;
                         }
@@ -309,7 +309,7 @@ public struct MoveGeneration{
                                 continue;
                             int move = Move.EncodeMove(src, dest, 
                                             (Piece)piece, Piece.noPiece, 
-                                            Helper.GetBit(board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)], dest) == 1, false, 
+                                            Helper.GetBit(board.Occupancies[(int)Helper.GetOpponent(side)], dest) == 1, false, 
                                             false, false);
                             moveList[moveIndex++] = move;
                         }
@@ -325,7 +325,7 @@ public struct MoveGeneration{
                                 continue;
                             int move = Move.EncodeMove(src, dest, 
                                             (Piece)piece, Piece.noPiece, 
-                                            Helper.GetBit(board.Occupancies[(int)(side == Side.White ? Side.Black : Side.White)], dest) == 1, false, 
+                                            Helper.GetBit(board.Occupancies[(int)Helper.GetOpponent(side)], dest) == 1, false, 
                                             false, false);
                             moveList[moveIndex++] = move;
                         }
