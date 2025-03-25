@@ -350,6 +350,13 @@ public struct MoveGeneration{
                 }
             }
         }
+        if (side == Side.White){
+            if (((short)board.Rights & (short)CastlingRights.wk) > 0) moveList[moveIndex++] = CastlingMove(board, CastlingRights.wk);
+            if (((short)board.Rights & (short)CastlingRights.wq) > 0) moveList[moveIndex++] = CastlingMove(board, CastlingRights.wq);
+        } else if (side == Side.Black){
+            if (((short)board.Rights & (short)CastlingRights.bk) > 0) moveList[moveIndex++] = CastlingMove(board, CastlingRights.bk);
+            if (((short)board.Rights & (short)CastlingRights.bq) > 0) moveList[moveIndex++] = CastlingMove(board, CastlingRights.bq);
+        }
         return moveList;
     }
 
@@ -359,6 +366,44 @@ public struct MoveGeneration{
         if (kingBitboard == 0) return false;
         int index = Helper.LSBIndex(kingBitboard);
         return Helper.CheckBit(kingBitboard, AttackedSquares[(int)(side == Side.Black ? Side.White : Side.Black)], index);
+    }
+
+    // If the castle flag is available, checks the conditions required for castling
+    private static int CastlingMove(Board board, CastlingRights right){
+        // Castle Mask is the squares that need to be clear for castling to occur
+        // Relevant Rank is rank that matters for the provided parameter
+        // Irrelevant Sq is the square that doesn't matter if its in check
+        ulong castleMask, irrelevantSq, relevantRank = board.Occupancies[(int)Side.Both];
+        switch(right){
+            case CastlingRights.wk:
+                relevantRank &= _FirstRank;
+                castleMask = 0x6;
+                if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.White] & castleMask) == 0) 
+                    return Move.EncodeMove((int)Square.e1, (int)Square.g1, Piece.WKing, Piece.noPiece, false, false, false, true);
+                break;
+            case CastlingRights.wq:
+                relevantRank &= _FirstRank;
+                castleMask = 0x70;
+                irrelevantSq = 0x40;
+                if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.White] & castleMask ^ irrelevantSq) == 0)
+                    return Move.EncodeMove((int)Square.e1, (int)Square.c1, Piece.WKing, Piece.noPiece, false, false, false, true);
+                break;
+            case CastlingRights.bk:
+                relevantRank &= _SecondRank;
+                castleMask = 0x600000000000000;
+                if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.Black] & castleMask) == 0)
+                    return Move.EncodeMove((int)Square.e8, (int)Square.g8, Piece.BKing, Piece.noPiece, false, false, false, true);
+                break;
+            case CastlingRights.bq:
+                relevantRank &= _SecondRank;
+                castleMask = 0x7000000000000000;
+                irrelevantSq = 0x4000000000000000;
+                if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.White] & castleMask ^ irrelevantSq) == 0)
+                    return Move.EncodeMove((int)Square.e8, (int)Square.c8, Piece.BKing, Piece.noPiece, false, false, false, true);
+                break;
+            default: throw new System.Exception("Invalid Castling Flag!");
+        }
+        return 0;
     }
 }
 
