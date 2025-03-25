@@ -72,8 +72,20 @@ public struct Board{
         // Updates Turn to Move
         PlayerTurn = FENPartitions[1] == "w" ? Side.White : Side.Black;
 
-        // TODO: Castling Rights
-        
+        // Parses castling rights
+        if (FENPartitions[2][0] == '-') Rights = 0;
+        else{
+            for (int i = 0; i < FENPartitions[2].Length; i++){
+                switch(FENPartitions[2][i]){
+                    case 'K': Rights |= CastlingRights.wk; break;
+                    case 'Q': Rights |= CastlingRights.wq; break;
+                    case 'k': Rights |= CastlingRights.bk; break;
+                    case 'q': Rights |= CastlingRights.bq; break;
+                    default: throw new Exception("Invalid FEN String");
+                }
+            }
+        }
+
         // Holds Enpassant Square
         Square result;
         if (Enum.TryParse(FENPartitions[3], out result)) Enpassant = result;
