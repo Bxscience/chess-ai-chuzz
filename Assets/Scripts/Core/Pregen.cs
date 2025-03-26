@@ -47,15 +47,4 @@ public struct Pregen{
         0xa4321021880c200, 0x800804000200a80, 0x4400402003021100, 0x4080f000080480, 0x40080004008080, 0x2000410080200, 0x100801020400, 0x4104388200, 
         0x10816024080a102, 0x41001820804001, 0x1045006001883041, 0x1002004100009, 0x2000810056082, 0x2002000804108102, 0x7060001040820c2, 0x102184104002282
     };
-
-    public readonly static Vector3[] SqtoCoords = {
-        new Vector3(3.78f, 0f, -3.79f), new Vector3(2.72f, 0f, -3.79f), new Vector3(1.64f, 0f, -3.79f), new Vector3(0.56f, 0f, -3.79f), new Vector3(-0.54f, 0f, -3.79f), new Vector3(-1.61f, 0f, -3.79f), new Vector3(-2.7f, 0f, -3.79f), new Vector3(-3.77f, 0f, -3.79f),
-        new Vector3(3.78f, 0f, -2.7f), new Vector3(2.72f, 0f, -2.7f), new Vector3(1.64f, 0f, -2.7f), new Vector3(0.56f, 0f, -2.7f), new Vector3(-0.54f, 0f, -2.7f), new Vector3(-1.61f, 0f, -2.7f), new Vector3(-2.7f, 0f, -2.7f), new Vector3(-3.77f, 0f, -2.7f),
-        new Vector3(3.78f, 0f, -1.62f), new Vector3(2.72f, 0f, -1.62f), new Vector3(1.64f, 0f, -1.62f), new Vector3(0.56f, 0f, -1.62f), new Vector3(-0.54f, 0f, -1.62f), new Vector3(-1.61f, 0f, -1.62f), new Vector3(-2.7f, 0f, -1.62f), new Vector3(-3.77f, 0f, -1.62f),
-        new Vector3(3.78f, 0f, -1.08f), new Vector3(2.72f, 0f, -1.08f), new Vector3(1.64f, 0f, -1.08f), new Vector3(0.56f, 0f, -1.08f), new Vector3(-0.54f, 0f, -1.08f), new Vector3(-1.61f, 0f, -1.08f), new Vector3(-2.7f, 0f, -1.08f), new Vector3(-3.77f, 0f, -1.08f),
-        new Vector3(3.78f, 0f, 2.16f), new Vector3(2.72f, 0f, 2.16f), new Vector3(1.64f, 0f, 2.16f), new Vector3(0.56f, 0f, 2.16f), new Vector3(-0.54f, 0f, 2.16f), new Vector3(-1.61f, 0f, 2.16f), new Vector3(-2.7f, 0f, 2.16f), new Vector3(-3.77f, 0f, 2.16f),
-        new Vector3(3.78f, 0f, 3.24f), new Vector3(2.72f, 0f, 3.24f), new Vector3(1.64f, 0f, 3.24f), new Vector3(0.56f, 0f, 3.24f), new Vector3(-0.54f, 0f, 3.24f), new Vector3(-1.61f, 0f, 3.24f), new Vector3(-2.7f, 0f, 3.24f), new Vector3(-3.77f, 0f, 3.24f),
-        new Vector3(3.78f, 0f, 4.31f), new Vector3(2.72f, 0f, 4.31f), new Vector3(1.64f, 0f, 4.31f), new Vector3(0.56f, 0f, 4.31f), new Vector3(-0.54f, 0f, 4.31f), new Vector3(-1.61f, 0f, 4.31f), new Vector3(-2.7f, 0f, 4.31f), new Vector3(-3.77f, 0f, 4.31f),
-        new Vector3(3.78f, 0f, 5.4f), new Vector3(2.72f, 0f, 5.4f), new Vector3(1.64f, 0f, 5.4f), new Vector3(0.56f, 0f, 5.4f), new Vector3(-0.54f, 0f, 5.4f), new Vector3(-1.61f, 0f, 5.4f), new Vector3(-2.7f, 0f, 5.4f), new Vector3(-3.77f, 0f, 5.4f),
-    };
 }

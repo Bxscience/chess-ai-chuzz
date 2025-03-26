@@ -149,7 +149,6 @@ public struct MoveGeneration{
                             int wMove = Move.EncodeMove(src, src + 8,
                                             (Piece)piece, Piece.noPiece,
                                             false, false, false, false);   
-                            Move.PrintMove(wMove);
                             moveList[moveIndex++] = wMove;
                             // Handles double pawn pushes
                             if (Helper.CheckBit(1ul << src, _SecondRank, src) && Helper.GetBit(board.Occupancies[(int)Side.Both], src + 16) == 0){
@@ -231,7 +230,6 @@ public struct MoveGeneration{
                             int bMove = Move.EncodeMove(src, src - 8,
                                             (Piece)piece, Piece.noPiece,
                                             false, false, false, false);   
-                            Move.PrintMove(bMove);
                             moveList[moveIndex++] = bMove;
                             // Handles double pawn pushes
                             if (Helper.CheckBit(1ul << src, _SeventhRank, src) && Helper.GetBit(board.Occupancies[(int)Side.Both], src - 16) == 0){

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 public class ChessBoardManager : MonoBehaviour{
 
@@ -14,6 +16,11 @@ public class ChessBoardManager : MonoBehaviour{
         AttackTables.InitAttackTables();
         int[] attacks = MoveGeneration.InitMoves(Chessboard, Side.Black);
         PlacePieces();
+    }
+
+    void Update(){
+        if (Input.GetMouseButtonDown(0))
+            GetSelectedPiece();
     }
 
     private void PlacePieces(){
@@ -45,5 +52,20 @@ public class ChessBoardManager : MonoBehaviour{
                 Pieces.Add(piece);
             }
         }
+    }
+
+    private GameObject GetSelectedPiece(){
+        Camera camera = Camera.main;
+        Vector3 screenPosition = Input.mousePosition;
+        Ray ray = camera.ScreenPointToRay(screenPosition);
+        RaycastHit hit;
+        Physics.Raycast(ray, out hit);
+        GameObject SelectedPiece = null;
+        switch(Chessboard.PlayerTurn){
+            case Side.White: if (hit.collider.tag == "White Pieces") SelectedPiece = hit.transform.gameObject; break;
+            case Side.Black: if (hit.collider.tag == "Black Pieces") SelectedPiece = hit.transform.gameObject; break;
+            default: throw new System.Exception("Something went wrong!");
+        }
+        return SelectedPiece;
     }
 }
