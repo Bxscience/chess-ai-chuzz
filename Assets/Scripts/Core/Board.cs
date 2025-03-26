@@ -30,9 +30,6 @@ public struct Board{
         Occupancies[(int)Side.Both] = Occupancies[(int)Side.White] | Occupancies[(int)Side.Black];
     }
 
-    public void TestBoard(){
-    }
-
     // Represents all values in FEN String as Piece Enums for easy transversal
     private Piece ValueSwitch(char c) => c switch{
         'P' => Piece.WPawn,
@@ -98,4 +95,5 @@ public struct Board{
         // TODO: Half Move Clock
         // TODO: Full Move Counter
     }
+
 }

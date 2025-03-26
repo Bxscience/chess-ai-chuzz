@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public struct Pregen{
     // Array holding all possible moves bishops can move to at that square
     public readonly static int[] BishopRelevantBits = {
@@ -44,5 +46,16 @@ public struct Pregen{
         0x40204000808000, 0x4090002000404000, 0x814410820010011, 0x1008001000808008, 0x88020004004040, 0x1000040002008080, 0xa20108040010, 0x2080c4104a20004, 
         0xa4321021880c200, 0x800804000200a80, 0x4400402003021100, 0x4080f000080480, 0x40080004008080, 0x2000410080200, 0x100801020400, 0x4104388200, 
         0x10816024080a102, 0x41001820804001, 0x1045006001883041, 0x1002004100009, 0x2000810056082, 0x2002000804108102, 0x7060001040820c2, 0x102184104002282
+    };
+
+    public readonly static Vector3[] SqtoCoords = {
+        new Vector3(3.78f, 0f, -3.79f), new Vector3(2.72f, 0f, -3.79f), new Vector3(1.64f, 0f, -3.79f), new Vector3(0.56f, 0f, -3.79f), new Vector3(-0.54f, 0f, -3.79f), new Vector3(-1.61f, 0f, -3.79f), new Vector3(-2.7f, 0f, -3.79f), new Vector3(-3.77f, 0f, -3.79f),
+        new Vector3(3.78f, 0f, -2.7f), new Vector3(2.72f, 0f, -2.7f), new Vector3(1.64f, 0f, -2.7f), new Vector3(0.56f, 0f, -2.7f), new Vector3(-0.54f, 0f, -2.7f), new Vector3(-1.61f, 0f, -2.7f), new Vector3(-2.7f, 0f, -2.7f), new Vector3(-3.77f, 0f, -2.7f),
+        new Vector3(3.78f, 0f, -1.62f), new Vector3(2.72f, 0f, -1.62f), new Vector3(1.64f, 0f, -1.62f), new Vector3(0.56f, 0f, -1.62f), new Vector3(-0.54f, 0f, -1.62f), new Vector3(-1.61f, 0f, -1.62f), new Vector3(-2.7f, 0f, -1.62f), new Vector3(-3.77f, 0f, -1.62f),
+        new Vector3(3.78f, 0f, -1.08f), new Vector3(2.72f, 0f, -1.08f), new Vector3(1.64f, 0f, -1.08f), new Vector3(0.56f, 0f, -1.08f), new Vector3(-0.54f, 0f, -1.08f), new Vector3(-1.61f, 0f, -1.08f), new Vector3(-2.7f, 0f, -1.08f), new Vector3(-3.77f, 0f, -1.08f),
+        new Vector3(3.78f, 0f, 2.16f), new Vector3(2.72f, 0f, 2.16f), new Vector3(1.64f, 0f, 2.16f), new Vector3(0.56f, 0f, 2.16f), new Vector3(-0.54f, 0f, 2.16f), new Vector3(-1.61f, 0f, 2.16f), new Vector3(-2.7f, 0f, 2.16f), new Vector3(-3.77f, 0f, 2.16f),
+        new Vector3(3.78f, 0f, 3.24f), new Vector3(2.72f, 0f, 3.24f), new Vector3(1.64f, 0f, 3.24f), new Vector3(0.56f, 0f, 3.24f), new Vector3(-0.54f, 0f, 3.24f), new Vector3(-1.61f, 0f, 3.24f), new Vector3(-2.7f, 0f, 3.24f), new Vector3(-3.77f, 0f, 3.24f),
+        new Vector3(3.78f, 0f, 4.31f), new Vector3(2.72f, 0f, 4.31f), new Vector3(1.64f, 0f, 4.31f), new Vector3(0.56f, 0f, 4.31f), new Vector3(-0.54f, 0f, 4.31f), new Vector3(-1.61f, 0f, 4.31f), new Vector3(-2.7f, 0f, 4.31f), new Vector3(-3.77f, 0f, 4.31f),
+        new Vector3(3.78f, 0f, 5.4f), new Vector3(2.72f, 0f, 5.4f), new Vector3(1.64f, 0f, 5.4f), new Vector3(0.56f, 0f, 5.4f), new Vector3(-0.54f, 0f, 5.4f), new Vector3(-1.61f, 0f, 5.4f), new Vector3(-2.7f, 0f, 5.4f), new Vector3(-3.77f, 0f, 5.4f),
     };
 }
