@@ -1,7 +1,6 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
 
 public class ChessBoardManager : MonoBehaviour{
 
@@ -9,20 +8,29 @@ public class ChessBoardManager : MonoBehaviour{
     private GameObject PieceParent, WPawn, WKnight, WBishop, WRook, WQueen, WKing, BPawn, BKnight, BBishop, BRook, BQueen, BKing;
     private List<GameObject> Pieces;
     public Board Chessboard;
+    public int[] attacks;
     // Empty Board: 8/8/8/8/8/8/8/8 w ---- - 0 1
     void Start(){
         Pieces = new List<GameObject>();
         Chessboard = new Board("");
         AttackTables.InitAttackTables();
-        int[] attacks = MoveGeneration.InitMoves(Chessboard, Side.Black);
+        attacks = MoveGeneration.InitMoves(Chessboard, Side.White);
+        //foreach (int moves in attacks)
+        //    if (moves != 0)
+        //        Move.PrintMove(moves);
         PlacePieces();
     }
 
     void Update(){
         if (Input.GetMouseButtonDown(0)){
             GameObject selectedPiece = GetSelectedPiece();
-            if (selectedPiece != null)
-                selectedPiece.transform.localPosition += new Vector3(0f, 1f, 0f);
+            //Debug.Log(selectedPiece.name);
+            if (selectedPiece != null){
+                int[] pieceMoves = GetMoveListForPiece(attacks, CoordToIndex(selectedPiece.transform));
+                foreach (int moves in pieceMoves)
+                    if (moves != 0)
+                        Move.PrintMove(moves);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.N)){
@@ -30,6 +38,7 @@ public class ChessBoardManager : MonoBehaviour{
         }
     }
 
+    // Should be run the first time the board is created, adds all the pieces on the board
     private void PlacePieces(){
         for (int pieces = 0; pieces < Board.BitboardCount; pieces++){
             ulong pieceBitboard = Chessboard.Bitboards[pieces];
@@ -61,18 +70,34 @@ public class ChessBoardManager : MonoBehaviour{
         }
     }
 
+    // Raycasts the mouse position on the screen to the board. Returns the piece that the ray hits.
     private GameObject GetSelectedPiece(){
         Camera camera = Camera.main;
         Vector3 screenPosition = Input.mousePosition;
         Ray ray = camera.ScreenPointToRay(screenPosition);
         RaycastHit hit;
         Physics.Raycast(ray, out hit);
-        GameObject SelectedPiece = null;
+        Transform SelectedPiece = null;
         switch(Chessboard.PlayerTurn){
-            case Side.White: if (hit.collider.tag == "White Pieces") SelectedPiece = hit.transform.gameObject; break;
-            case Side.Black: if (hit.collider.tag == "Black Pieces") SelectedPiece = hit.transform.gameObject; break;
-            default: throw new System.Exception("Something went wrong!");
+            case Side.White: if (hit.collider.tag == "White Pieces") SelectedPiece = hit.transform; break;
+            case Side.Black: if (hit.collider.tag == "Black Pieces") SelectedPiece = hit.transform; break;
+            default: throw new Exception("Something went wrong!");
         }
-        return SelectedPiece;
+        return SelectedPiece.parent.gameObject;
+    }
+
+    // Gives the coordinate to square index
+    private int CoordToIndex(Transform position) => Math.Abs((int)position.localPosition.x) + Math.Abs((int)position.localPosition.z) * 8;
+
+    // Given the square the piece is on, gives the possible moves for the list
+    private int[] GetMoveListForPiece(int[] moveList, int index){
+        int[] possibleMoves = new int[256];
+        int arrayIndex = 0;
+        foreach (int moves in moveList){
+            if (Move.GetSrcSquare(moves) == index){
+                possibleMoves[arrayIndex++] = moves;
+            } else if (moves == 0) break;
+        } 
+        return possibleMoves;
     }
 }
