@@ -8,6 +8,7 @@ public class ChessBoardManager : MonoBehaviour{
     private GameObject PieceParent, WPawn, WKnight, WBishop, WRook, WQueen, WKing, BPawn, BKnight, BBishop, BRook, BQueen, BKing;
     private List<GameObject> Pieces;
     public Board Chessboard;
+    public GameObject SelectedPiece;
     public int[] attacks;
     // Empty Board: 8/8/8/8/8/8/8/8 w ---- - 0 1
     void Start(){
@@ -15,21 +16,16 @@ public class ChessBoardManager : MonoBehaviour{
         Chessboard = new Board("");
         AttackTables.InitAttackTables();
         attacks = MoveGeneration.InitMoves(Chessboard, Side.White);
-        //foreach (int moves in attacks)
-        //    if (moves != 0)
-        //        Move.PrintMove(moves);
         PlacePieces();
     }
 
     void Update(){
         if (Input.GetMouseButtonDown(0)){
-            GameObject selectedPiece = GetSelectedPiece();
-            //Debug.Log(selectedPiece.name);
-            if (selectedPiece != null){
-                int[] pieceMoves = GetMoveListForPiece(attacks, CoordToIndex(selectedPiece.transform));
-                foreach (int moves in pieceMoves)
-                    if (moves != 0)
-                        Move.PrintMove(moves);
+            GameObject temp = GetSelectedPiece();
+            if (temp != null && temp != SelectedPiece){
+                SelectedPiece = temp;
+                int[] pieceMoves = GetMoveListForPiece(attacks, CoordToIndex(SelectedPiece.transform));
+                VisualizeMoves(pieceMoves, SelectedPiece);
             }
         }
 
@@ -78,11 +74,13 @@ public class ChessBoardManager : MonoBehaviour{
         RaycastHit hit;
         Physics.Raycast(ray, out hit);
         Transform SelectedPiece = null;
-        switch(Chessboard.PlayerTurn){
-            case Side.White: if (hit.collider.tag == "White Pieces") SelectedPiece = hit.transform; break;
-            case Side.Black: if (hit.collider.tag == "Black Pieces") SelectedPiece = hit.transform; break;
-            default: throw new Exception("Something went wrong!");
-        }
+        if (hit.collider != null){
+            switch(Chessboard.PlayerTurn){
+                case Side.White: if (hit.collider.tag == "White Pieces") SelectedPiece = hit.transform; break;
+                case Side.Black: if (hit.collider.tag == "Black Pieces") SelectedPiece = hit.transform; break;
+                default: throw new Exception("Something went wrong!");
+            }
+        } else return null; 
         return SelectedPiece.parent.gameObject;
     }
 
@@ -99,5 +97,9 @@ public class ChessBoardManager : MonoBehaviour{
             } else if (moves == 0) break;
         } 
         return possibleMoves;
+    }
+
+    private void VisualizeMoves(int[] moves, GameObject piece){
+        piece.transform.localPosition += new Vector3(0f, 0.2f, 0f);
     }
 }
