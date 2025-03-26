@@ -19,8 +19,15 @@ public class ChessBoardManager : MonoBehaviour{
     }
 
     void Update(){
-        if (Input.GetMouseButtonDown(0))
-            GetSelectedPiece();
+        if (Input.GetMouseButtonDown(0)){
+            GameObject selectedPiece = GetSelectedPiece();
+            if (selectedPiece != null)
+                selectedPiece.transform.localPosition += new Vector3(0f, 1f, 0f);
+        }
+
+        if (Input.GetKeyDown(KeyCode.N)){
+            Chessboard.PlayerTurn = Helper.GetOpponent(Chessboard.PlayerTurn);
+        }
     }
 
     private void PlacePieces(){
