@@ -398,7 +398,7 @@ public struct MoveGeneration{
                 relevantRank &= _FirstRank;
                 castleMask = 0x70;
                 irrelevantSq = 0x40;
-                if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.White] & castleMask ^ irrelevantSq) == 0)
+                if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.White] & (castleMask ^ irrelevantSq)) == 0)
                     return Move.EncodeMove((int)Square.e1, (int)Square.c1, Piece.WKing, Piece.noPiece, false, false, false, true);
                 break;
             case CastlingRights.bk:
