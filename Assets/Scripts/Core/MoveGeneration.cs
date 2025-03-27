@@ -314,6 +314,21 @@ public struct MoveGeneration{
                             moveList[moveIndex++] = move;
                         }
                         break;
+                    case Piece.WRook: case Piece.BRook:
+                        attacks = AttackTables.GetRookAttacks(src, board.Occupancies[(int)Side.Both]);
+                        possibleAttacks = Helper.CountBit(attacks);
+                        for (int iternator = 0; iternator < possibleAttacks; iternator++){
+                            int dest = Helper.LSBIndex(attacks);
+                            Helper.PopBit(ref attacks, dest);
+                            if (!Helper.CheckBit(board.Occupancies[(int)side], attacks, dest))
+                                continue;
+                            int move = Move.EncodeMove(src, dest, 
+                                            (Piece)piece, Piece.noPiece, 
+                                            Helper.GetBit(board.Occupancies[(int)Helper.GetOpponent(side)], dest) == 1, false, 
+                                            false, false);
+                            moveList[moveIndex++] = move;
+                        }
+                        break;
                     case Piece.BQueen: case Piece.WQueen:
                         attacks = AttackTables.GetQueenAttacks(src, board.Occupancies[(int)Side.Both]);
                         possibleAttacks = Helper.CountBit(attacks);
