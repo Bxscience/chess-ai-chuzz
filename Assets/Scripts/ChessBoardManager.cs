@@ -1,16 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ChessBoardManager : MonoBehaviour{
 
     [SerializeField]
-    private GameObject PieceParent, WPawn, WKnight, WBishop, WRook, WQueen, WKing, BPawn, BKnight, BBishop, BRook, BQueen, BKing;
+    private GameObject PieceParent, WPawn, WKnight, WBishop, WRook, WQueen, WKing, BPawn, BKnight, BBishop, BRook, BQueen, BKing, SelectedSquareIndicator, PossibleMovesIndicator;
+    
+    [HideInInspector]
     private List<GameObject> Pieces;
+    
+    [HideInInspector]
     public Board Chessboard;
+
+    [HideInInspector]
     public GameObject SelectedPiece;
+
+    // Holds all gameobjects used to visualize a move
+    [HideInInspector]
+    public List<GameObject> SelectedPieceVisuals;
+
+    [HideInInspector]
     public int[] attacks;
     // Empty Board: 8/8/8/8/8/8/8/8 w ---- - 0 1
+
     void Start(){
         Pieces = new List<GameObject>();
         Chessboard = new Board("");
@@ -23,10 +37,11 @@ public class ChessBoardManager : MonoBehaviour{
         if (Input.GetMouseButtonDown(0)){
             GameObject temp = GetSelectedPiece();
             if (temp != null && temp != SelectedPiece){
+                DeselectPiece();
                 SelectedPiece = temp;
                 int[] pieceMoves = GetMoveListForPiece(attacks, CoordToIndex(SelectedPiece.transform));
                 VisualizeMoves(pieceMoves, SelectedPiece);
-            }
+            } else if (temp != null && temp == SelectedPiece) DeselectPiece();
         }
 
         if (Input.GetKeyDown(KeyCode.N)){
@@ -43,7 +58,7 @@ public class ChessBoardManager : MonoBehaviour{
                 GameObject pieceObject;
                 int index = Helper.LSBIndex(pieceBitboard);
                 Helper.PopBit(ref pieceBitboard, index);
-                Vector3 position = new Vector3(index % 8 - 7f, 0f, index / 8);
+                Vector3 position = IndexToCoord(index);
                 switch((Piece)pieces){
                     case Piece.WPawn: pieceObject = WPawn; break;
                     case Piece.WKnight: pieceObject = WKnight; break;
@@ -76,13 +91,24 @@ public class ChessBoardManager : MonoBehaviour{
         Transform SelectedPiece = null;
         if (hit.collider != null){
             switch(Chessboard.PlayerTurn){
-                case Side.White: if (hit.collider.tag == "White Pieces") SelectedPiece = hit.transform; break;
-                case Side.Black: if (hit.collider.tag == "Black Pieces") SelectedPiece = hit.transform; break;
+                case Side.White: 
+                    if (hit.collider.tag == "White Pieces") 
+                        SelectedPiece = hit.transform;
+                    else return null;
+                    break;
+                case Side.Black: 
+                    if (hit.collider.tag == "Black Pieces") 
+                        SelectedPiece = hit.transform;
+                    else return null;
+                    break;
                 default: throw new Exception("Something went wrong!");
             }
-        } else return null; 
+        } else return null;
         return SelectedPiece.parent.gameObject;
     }
+
+    // Gives the square to coordinate in world 
+    private Vector3 IndexToCoord(int index) => new Vector3(-1 * index % 8, 0.3f, index / 8);
 
     // Gives the coordinate to square index
     private int CoordToIndex(Transform position) => Math.Abs((int)position.localPosition.x) + Math.Abs((int)position.localPosition.z) * 8;
@@ -100,6 +126,24 @@ public class ChessBoardManager : MonoBehaviour{
     }
 
     private void VisualizeMoves(int[] moves, GameObject piece){
+        SelectedPieceVisuals.Add(Instantiate(SelectedSquareIndicator, piece.transform.position, Quaternion.identity));
         piece.transform.localPosition += new Vector3(0f, 0.2f, 0f);
+        foreach (int move in moves){
+            if (move != 0){
+                SelectedPieceVisuals.Add(Instantiate(PossibleMovesIndicator, PieceParent.transform, false));
+                SelectedPieceVisuals.Last().transform.localPosition = IndexToCoord(Move.GetDestSquare(move));
+            }
+        }
+    }
+
+    private void DeselectPiece(){
+        if (SelectedPieceVisuals == null || SelectedPiece == null) return;
+        SelectedPiece.transform.localPosition -= new Vector3(0f, 0.2f, 0f);
+
+        SelectedPiece = null;
+        for (int i = 0; i < SelectedPieceVisuals.Count; i++){
+            Destroy(SelectedPieceVisuals[i]);
+        }
+        SelectedPieceVisuals.Clear();
     }
 }

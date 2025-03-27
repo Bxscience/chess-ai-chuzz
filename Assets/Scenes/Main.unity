@@ -144,7 +144,7 @@ Transform:
   m_GameObject: {fileID: 51410408}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.5, y: 0.3, z: -3.5}
+  m_LocalPosition: {x: 3.5, y: 0, z: -3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -861,6 +861,11 @@ MonoBehaviour:
   BRook: {fileID: 1418577212984322221, guid: fe45f5fe2b9dbdf42b6044a23332ce9e, type: 3}
   BQueen: {fileID: 3780438328246563921, guid: e33b1949558e47544a03594e855ca9f0, type: 3}
   BKing: {fileID: 5556106810774329644, guid: dd3ce076770a2024ab25e5e3d07871ff, type: 3}
+  SelectedSquareIndicator: {fileID: 7797283155778007116, guid: 470543aaefb8e9f4ca6ae15a0e043158, type: 3}
+  PossibleMovesIndicator: {fileID: 4584304959512651374, guid: 467e753c66bdd7943bfcee6e9520d2ef, type: 3}
+  SelectedPiece: {fileID: 0}
+  SelectedPieceVisuals: []
+  attacks: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
