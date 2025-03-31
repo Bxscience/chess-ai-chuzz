@@ -9,6 +9,8 @@
 1000 0000 0000 0000 0000 0000       castling flag (1 bit)                   0x800000
 when move == 0, the move is null
 */
+using System;
+
 public struct Move{
     // Converts moves on the board to binary for easier handling
     public static int EncodeMove(int src, int dest, Piece piece, Piece promotedPiece, bool capture, bool doublePush, bool enpassant, bool castling){
@@ -364,6 +366,71 @@ public struct MoveGeneration{
         if (kingBitboard == 0) return false;
         int index = Helper.LSBIndex(kingBitboard);
         return Helper.CheckBit(kingBitboard, AttackedSquares[(int)(side == Side.Black ? Side.White : Side.Black)], index);
+    }
+
+    // Sorts the moves in a array of moves, given the property to be searched and the value
+    public static int[] SortMoves(int[] inputMoves, Properties p, int value){
+        int[] moves = new int[256];
+        int moveIndex = 0;
+        switch (p){
+            case Properties.src:
+                foreach (int move in inputMoves){
+                    if (Move.GetSrcSquare(move) == value)
+                        moves[moveIndex++] = move;
+                    else if (move == 0) break;
+                }
+                break;
+            case Properties.dest:
+                foreach (int move in inputMoves){
+                    if (Move.GetDestSquare(move) == value)
+                        moves[moveIndex++] = move;
+                    else if (move == 0) break;
+                }
+                break;
+            case Properties.piece:
+                foreach (int move in inputMoves){
+                    if (Move.GetPiece(move) == (Piece)value)
+                        moves[moveIndex++] = move;
+                    else if (move == 0) break;
+                }
+                break;
+            case Properties.promotedPiece:
+                foreach (int move in inputMoves){
+                    if (Move.GetPromotedPiece(move) == (Piece)value)
+                        moves[moveIndex++] = move;
+                    else if (move == 0) break;
+                }
+                break;
+            case Properties.capture:
+                foreach (int move in inputMoves){
+                    if (Move.IsCapture(move) == (value == 1 ? true : false))
+                        moves[moveIndex++] = move;
+                    else if (move == 0) break;
+                }
+                break;
+            case Properties.doublePush:
+                foreach (int move in inputMoves){
+                    if (Move.IsPush(move) == (value == 1 ? true : false))
+                        moves[moveIndex++] = move;
+                    else if (move == 0) break;
+                }
+                break;
+            case Properties.enpassant:
+                foreach (int move in inputMoves){
+                    if (Move.IsEnpassant(move) == (value == 1 ? true : false))
+                        moves[moveIndex++] = move;
+                    else if (move == 0) break;
+                }
+                break;
+            case Properties.castling:
+                foreach (int move in inputMoves){
+                    if (Move.IsCastle(move) == (value == 1 ? true : false))
+                        moves[moveIndex++] = move;
+                    else if (move == 0) break;
+                }
+                break;
+        }
+        return moves;
     }
 
     // If the castle flag is available, checks the conditions required for castling

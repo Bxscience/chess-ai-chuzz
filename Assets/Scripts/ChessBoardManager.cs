@@ -36,18 +36,32 @@ public class ChessBoardManager : MonoBehaviour{
     void Update(){
         if (Input.GetMouseButtonDown(0)){
             GameObject temp = GetSelectedPiece();
+            int square = GetSelectedSquare();
             if (temp != null && temp != SelectedPiece){
                 DeselectPiece();
                 SelectedPiece = temp;
-                int[] pieceMoves = GetMoveListForPiece(attacks, CoordToIndex(SelectedPiece.transform));
+                int[] pieceMoves = MoveGeneration.SortMoves(attacks, Properties.src, CoordToIndex(SelectedPiece.transform));
                 VisualizeMoves(pieceMoves, SelectedPiece);
             } else if (temp != null && temp == SelectedPiece) DeselectPiece();
+            else if (temp == null && SelectedPiece != null && square != -1);
         }
 
         if (Input.GetKeyDown(KeyCode.N)){
             Chessboard.PlayerTurn = Helper.GetOpponent(Chessboard.PlayerTurn);
         }
     }
+
+/*
+    private int HandleMoveInputs(){
+        GameObject temp = GetSelectedPiece();
+        int square = GetSelectedSquare();
+        if (temp != null && temp != SelectedPiece){
+            DeselectPiece();
+            SelectedPiece = temp;
+            int[] pieceMoves = GetMoveListForPiece(attacks, CoordToIndex)
+        }
+    }
+*/
 
     // Should be run the first time the board is created, adds all the pieces on the board
     private void PlacePieces(){
@@ -83,12 +97,11 @@ public class ChessBoardManager : MonoBehaviour{
 
     // Raycasts the mouse position on the screen to the board. Returns the piece that the ray hits.
     private GameObject GetSelectedPiece(){
-        Camera camera = Camera.main;
         Vector3 screenPosition = Input.mousePosition;
-        Ray ray = camera.ScreenPointToRay(screenPosition);
+        Ray ray = Camera.main.ScreenPointToRay(screenPosition);
         RaycastHit hit;
         Physics.Raycast(ray, out hit);
-        Transform SelectedPiece = null;
+        Transform SelectedPiece;
         if (hit.collider != null){
             switch(Chessboard.PlayerTurn){
                 case Side.White: 
@@ -107,24 +120,26 @@ public class ChessBoardManager : MonoBehaviour{
         return SelectedPiece.parent.gameObject;
     }
 
+    private int GetSelectedSquare(){
+        Vector3 screenPosition = Input.mousePosition;
+        Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+        RaycastHit hit;
+        Physics.Raycast(ray, out hit);
+        if (hit.collider != null){
+            if (hit.collider.tag == "Board"){
+                return int.Parse(hit.collider.name.Split(" ")[1]);
+            }
+        }
+        return -1;
+    }
+
     // Gives the square to coordinate in world 
     private Vector3 IndexToCoord(int index) => new Vector3(-1 * index % 8, 0.3f, index / 8);
 
     // Gives the coordinate to square index
     private int CoordToIndex(Transform position) => Math.Abs((int)position.localPosition.x) + Math.Abs((int)position.localPosition.z) * 8;
 
-    // Given the square the piece is on, gives the possible moves for the list
-    private int[] GetMoveListForPiece(int[] moveList, int index){
-        int[] possibleMoves = new int[256];
-        int arrayIndex = 0;
-        foreach (int moves in moveList){
-            if (Move.GetSrcSquare(moves) == index){
-                possibleMoves[arrayIndex++] = moves;
-            } else if (moves == 0) break;
-        } 
-        return possibleMoves;
-    }
-
+    // Visualizes the moves that a piece can do, as well as the current selected piece
     private void VisualizeMoves(int[] moves, GameObject piece){
         SelectedPieceVisuals.Add(Instantiate(SelectedSquareIndicator, piece.transform.position, Quaternion.identity));
         piece.transform.localPosition += new Vector3(0f, 0.2f, 0f);
@@ -136,6 +151,7 @@ public class ChessBoardManager : MonoBehaviour{
         }
     }
 
+    // Removes the visuals for a selected piece
     private void DeselectPiece(){
         if (SelectedPieceVisuals == null || SelectedPiece == null) return;
         SelectedPiece.transform.localPosition -= new Vector3(0f, 0.2f, 0f);

@@ -33,3 +33,7 @@ public enum Square{
 public enum CastlingRights{
     wk = 1, wq = 2, bk = 4, bq = 8
 }
+
+public enum Properties{
+    src, dest, piece, promotedPiece, capture, doublePush, enpassant, castling
+}
