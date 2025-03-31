@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class ChessBoardManager : MonoBehaviour{
 
     [SerializeField]
-    private GameObject PieceParent, WPawn, WKnight, WBishop, WRook, WQueen, WKing, BPawn, BKnight, BBishop, BRook, BQueen, BKing, SelectedSquareIndicator, PossibleMovesIndicator;
+    private GameObject PieceParent, WPawn, WKnight, WBishop, WRook, WQueen, WKing, BPawn, BKnight, BBishop, BRook, BQueen, BKing, SelectedSquareIndicator, PossibleMovesIndicator, AttackedMovesIndicator;
     
     [HideInInspector]
     private List<GameObject> Pieces;
@@ -28,23 +27,15 @@ public class ChessBoardManager : MonoBehaviour{
 
     void Start(){
         Pieces = new List<GameObject>();
-        Chessboard = new Board("8/8/8/8/8/8/PPPPPPPP/R3K2R w KQ - 0 1");
+        Chessboard = new Board("8/8/8/4p3/3P4/8/8/8 b - - 0 1");
         AttackTables.InitAttackTables();
-        attacks = MoveGeneration.InitMoves(Chessboard, Side.White);
+        attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
         PlacePieces();
     }
 
     void Update(){
         if (Input.GetMouseButtonDown(0)){
-            GameObject temp = GetSelectedPiece();
-            int square = GetSelectedSquare();
-            if (temp != null && temp != SelectedPiece){
-                DeselectPiece();
-                SelectedPiece = temp;
-                int[] pieceMoves = MoveGeneration.SortMoves(attacks, Properties.src, CoordToIndex(SelectedPiece.transform));
-                VisualizeMoves(pieceMoves, SelectedPiece);
-            } else if (temp != null && temp == SelectedPiece) DeselectPiece();
-            else if (temp == null && SelectedPiece != null && square != -1);
+            HandleMoveInputs();
         }
 
         if (Input.GetKeyDown(KeyCode.N)){
@@ -52,17 +43,24 @@ public class ChessBoardManager : MonoBehaviour{
         }
     }
 
-/*
+
     private int HandleMoveInputs(){
         GameObject temp = GetSelectedPiece();
-        int square = GetSelectedSquare();
+        int srcSquare, destSquare = GetSelectedSquare();
+        // If there is a piece selected and its a new piece
         if (temp != null && temp != SelectedPiece){
             DeselectPiece();
             SelectedPiece = temp;
-            int[] pieceMoves = GetMoveListForPiece(attacks, CoordToIndex)
-        }
+            int[] pieceMoves = MoveGeneration.SortMoves(attacks, Properties.src, CoordToIndex(SelectedPiece.transform));
+            VisualizeMoves(pieceMoves, SelectedPiece);
+        } 
+        // If there is a piece selected and its the same piece
+        else if (temp != null && temp == SelectedPiece) DeselectPiece();
+        // If there is a piece selected and its a square that was clicked
+        else if (temp == null && SelectedPiece != null && destSquare != -1);
+        return -1;
     }
-*/
+
 
     // Should be run the first time the board is created, adds all the pieces on the board
     private void PlacePieces(){
@@ -146,8 +144,13 @@ public class ChessBoardManager : MonoBehaviour{
         piece.transform.localPosition += new Vector3(0f, 0.2f, 0f);
         foreach (int move in moves){
             if (move != 0){
-                SelectedPieceVisuals.Add(Instantiate(PossibleMovesIndicator, PieceParent.transform, false));
-                SelectedPieceVisuals.Last().transform.localPosition = IndexToCoord(Move.GetDestSquare(move));
+                GameObject obj;
+                if (Move.IsCapture(move))
+                    obj = Instantiate(AttackedMovesIndicator, PieceParent.transform, false);
+                else
+                    obj = Instantiate(PossibleMovesIndicator, PieceParent.transform, false);
+                obj.transform.localPosition = IndexToCoord(Move.GetDestSquare(move));
+                SelectedPieceVisuals.Add(obj);
             }
         }
     }

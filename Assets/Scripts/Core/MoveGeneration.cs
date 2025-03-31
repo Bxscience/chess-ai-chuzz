@@ -107,7 +107,6 @@ public struct MoveGeneration{
     public static void UpdateAttackMap(int move){}
 
     // Creates an int array storing possible moves while determining legal moves
-    // TODO: Pawns need to do enpassant moves!!
     public static int[] InitMoves(Board board, Side side){
         int[] moveList = new int[256];
         int moveIndex = 0;
