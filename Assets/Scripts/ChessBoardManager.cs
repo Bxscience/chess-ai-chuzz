@@ -21,13 +21,14 @@ public class ChessBoardManager : MonoBehaviour{
     [HideInInspector]
     public List<GameObject> SelectedPieceVisuals;
 
+    // All attacks in the position
     [HideInInspector]
     public int[] attacks;
     // Empty Board: 8/8/8/8/8/8/8/8 w ---- - 0 1
 
     void Start(){
         Pieces = new List<GameObject>();
-        Chessboard = new Board("");
+        Chessboard = new Board("8/8/8/8/8/8/PPPPPPPP/R3K2R w KQ - 0 1");
         AttackTables.InitAttackTables();
         attacks = MoveGeneration.InitMoves(Chessboard, Side.White);
         PlacePieces();
