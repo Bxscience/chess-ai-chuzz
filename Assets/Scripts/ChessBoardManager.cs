@@ -20,17 +20,19 @@ public class ChessBoardManager : MonoBehaviour{
     [HideInInspector]
     public List<GameObject> SelectedPieceVisuals;
 
-    // All attacks in the position
+    // All moves in the position, Attacks for the currently selected piece
     [HideInInspector]
-    public int[] attacks;
+    public int[] Attacks, SelectedPieceAttacks;
     // Empty Board: 8/8/8/8/8/8/8/8 w ---- - 0 1
 
     void Start(){
         Pieces = new List<GameObject>();
-        Chessboard = new Board("8/8/8/4p3/3P4/8/8/8 b - - 0 1");
+        Chessboard = new Board("8/8/8/4p3/3P4/8/8/8 w - - 0 1");
         AttackTables.InitAttackTables();
-        attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
+        Attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
+        SelectedPieceAttacks = null;
         PlacePieces();
+        ManagePieceColliders();
     }
 
     void Update(){
@@ -43,7 +45,7 @@ public class ChessBoardManager : MonoBehaviour{
         }
     }
 
-
+    // Handles all the move inputs to get from actions on board to move ints
     private int HandleMoveInputs(){
         GameObject temp = GetSelectedPiece();
         int srcSquare, destSquare = GetSelectedSquare();
@@ -51,16 +53,21 @@ public class ChessBoardManager : MonoBehaviour{
         if (temp != null && temp != SelectedPiece){
             DeselectPiece();
             SelectedPiece = temp;
-            int[] pieceMoves = MoveGeneration.SortMoves(attacks, Properties.src, CoordToIndex(SelectedPiece.transform));
-            VisualizeMoves(pieceMoves, SelectedPiece);
+            SelectedPieceAttacks = MoveGeneration.SortMoves(Attacks, Properties.src, CoordToIndex(SelectedPiece.transform));
+            VisualizeMoves(SelectedPieceAttacks, SelectedPiece);
         } 
         // If there is a piece selected and its the same piece
         else if (temp != null && temp == SelectedPiece) DeselectPiece();
         // If there is a piece selected and its a square that was clicked
-        else if (temp == null && SelectedPiece != null && destSquare != -1);
+        else if (temp == null && SelectedPiece != null && destSquare != -1){
+            int[] chosenMoves = MoveGeneration.SortMoves(SelectedPieceAttacks, Properties.dest, destSquare);
+            foreach (int move in chosenMoves){
+                if (move != 0)
+                    Move.PrintMove(move);
+            }
+        }
         return -1;
     }
-
 
     // Should be run the first time the board is created, adds all the pieces on the board
     private void PlacePieces(){
@@ -99,7 +106,7 @@ public class ChessBoardManager : MonoBehaviour{
         Vector3 screenPosition = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(screenPosition);
         RaycastHit hit;
-        Physics.Raycast(ray, out hit);
+        Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("Default"));
         Transform SelectedPiece;
         if (hit.collider != null){
             switch(Chessboard.PlayerTurn){
@@ -165,5 +172,24 @@ public class ChessBoardManager : MonoBehaviour{
             Destroy(SelectedPieceVisuals[i]);
         }
         SelectedPieceVisuals.Clear();
+    }
+
+    // Turns off the opposite team's mesh colliders
+    private void ManagePieceColliders(){
+        GameObject[] wArray, bArray;
+        wArray = GameObject.FindGameObjectsWithTag("White Pieces");
+        bArray = GameObject.FindGameObjectsWithTag("Black Pieces");
+        if (Chessboard.PlayerTurn == Side.White){
+            for (int i = 0; i < wArray.Length; i++)
+                wArray[i].layer = LayerMask.NameToLayer("Default");
+            for (int i = 0; i < bArray.Length; i++)
+                bArray[i].layer = LayerMask.NameToLayer("Ignore Raycast");
+        }
+        else {
+            for (int i = 0; i < wArray.Length; i++)
+                wArray[i].layer = LayerMask.NameToLayer("Ignore Raycast");
+            for (int i = 0; i < bArray.Length; i++)
+                bArray[i].layer = LayerMask.NameToLayer("Default");
+        }
     }
 }
