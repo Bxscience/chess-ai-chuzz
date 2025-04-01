@@ -27,7 +27,7 @@ public class ChessBoardManager : MonoBehaviour{
 
     void Start(){
         Pieces = new List<GameObject>();
-        Chessboard = new Board("8/8/8/4p3/3P4/8/8/8 w - - 0 1");
+        Chessboard = new Board("8/8/8/8/3Pp3/8/8/8 b - d3 0 1");
         AttackTables.InitAttackTables();
         Attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
         SelectedPieceAttacks = null;
@@ -48,13 +48,24 @@ public class ChessBoardManager : MonoBehaviour{
     // TODO: Fix raycasting or find better way to get the piece that is being captured
     private void MakeMove(int move){
         int src = Move.GetSrcSquare(move), dest = Move.GetDestSquare(move);
-        Transform destSquare = transform.Find("Model " + dest);
+        Vector3 offset;
+        Transform destSquare = transform.Find("Tiles");
+        destSquare = destSquare.Find("Model " + dest);
         if (Move.IsCapture(move)) {
             RaycastHit hit;
-            if (Physics.Raycast(destSquare.position, Vector3.up, out hit, 10.0f, LayerMask.GetMask("White") | LayerMask.GetMask("Black"))){
-                Destroy(hit.collider);
-            } else throw new Exception("There is a error!");
+            if (!Move.IsEnpassant(move)){
+                if (Physics.Raycast(destSquare.position + new Vector3(0.5f, 0f, 0.5f), Vector3.up, out hit, 10.0f, LayerMask.GetMask("White") | LayerMask.GetMask("Black")))
+                    Destroy(hit.collider.gameObject);
+                 else throw new Exception("Capture Piece not on square!");
+            } else {
+                offset = Chessboard.PlayerTurn == Side.White ? new Vector3(0.5f, 0f, -0.5f) : new Vector3(0.5f, 0f, 1.5f);
+                if (Physics.Raycast(destSquare.position + offset, Vector3.up, out hit, 10.0f, LayerMask.GetMask("White") | LayerMask.GetMask("Black")))
+                    Destroy(hit.collider.gameObject);
+                else throw new Exception("Enpassant Piece not on square!");
+            }
         }
+        SelectedPiece.transform.localPosition = IndexToCoord(dest) + new Vector3(0f, 0.2f, 0f);
+        DeselectPiece();
     }
 
     // Handles all the move inputs to get from actions on board to move ints

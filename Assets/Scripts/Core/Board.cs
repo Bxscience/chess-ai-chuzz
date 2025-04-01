@@ -91,7 +91,7 @@ public struct Board{
         if (Enum.TryParse(FENPartitions[3], out result)) Enpassant = result;
         else if (FENPartitions[3][0] == '-') Enpassant = Square.noSq;
         else throw new Exception("Invalid FEN String");
-
+        
         // TODO: Half Move Clock
         // TODO: Full Move Counter
     }

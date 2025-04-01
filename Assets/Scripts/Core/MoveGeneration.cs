@@ -198,7 +198,7 @@ public struct MoveGeneration{
 
                         // Enpassants for the white side (If black did a double pawn push, then white can enpassant)
                         enpassant = (int)board.Enpassant;
-                        if (board.PlayerTurn == Side.White && (src << 7 == enpassant || src << 9 == enpassant)){
+                        if (board.PlayerTurn == Side.White && (src + 7 == enpassant || src + 9 == enpassant)){
                             int moves = Move.EncodeMove(src, enpassant,
                                             (Piece)piece, Piece.noPiece,
                                             true, false, true, false);
@@ -278,7 +278,7 @@ public struct MoveGeneration{
                         }
                         // Enpassants for the white side (If black did a double pawn push, then white can enpassant)
                         enpassant = (int)board.Enpassant;
-                        if (board.PlayerTurn == Side.White && (src >> 7 == enpassant || src >> 9 == enpassant)){
+                        if (board.PlayerTurn == Side.Black && (src - 7 == enpassant || src - 9 == enpassant)){
                             int moves = Move.EncodeMove(src, enpassant,
                                             (Piece)piece, Piece.noPiece,
                                             true, false, true, false);
@@ -485,4 +485,3 @@ public struct MoveGeneration{
         return 0;
     }
 }
-
