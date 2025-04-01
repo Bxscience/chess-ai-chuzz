@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8997233226235065067}
   - component: {fileID: 513516615913307905}
   - component: {fileID: 672861252050572975}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model 0
   m_TagString: Black Pieces
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8804667105326406967}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: black_pawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}

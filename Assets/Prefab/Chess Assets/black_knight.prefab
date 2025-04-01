@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4729023509006157964}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: black_knight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 1768418972238893994}
   - component: {fileID: 4554807314142125258}
   - component: {fileID: 8422449995545336329}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model 0
   m_TagString: Black Pieces
   m_Icon: {fileID: 0}

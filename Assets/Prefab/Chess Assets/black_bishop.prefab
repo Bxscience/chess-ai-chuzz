@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5296515352167570029}
   - component: {fileID: 3845220579098015693}
   - component: {fileID: 568459428396300452}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model 0
   m_TagString: Black Pieces
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2459214339561790771}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: black_bishop
   m_TagString: Untagged
   m_Icon: {fileID: 0}

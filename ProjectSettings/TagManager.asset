@@ -5,15 +5,17 @@ TagManager:
   serializedVersion: 3
   tags:
   - Board
+  - White Pieces
+  - Black Pieces
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Board
   - Water
   - UI
-  - 
-  - 
+  - White
+  - Black
   - 
   - 
   - 

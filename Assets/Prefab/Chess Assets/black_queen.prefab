@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4256221432094061863}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: black_queen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 2255627013538214347}
   - component: {fileID: 4718733119651227982}
   - component: {fileID: 3688394281193956887}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model 0
   m_TagString: Black Pieces
   m_Icon: {fileID: 0}

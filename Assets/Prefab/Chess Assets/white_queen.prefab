@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2876362159902503024}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: white_queen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 2170529505578849157}
   - component: {fileID: 1889994347656428297}
   - component: {fileID: 4040089267198644737}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Model 0
   m_TagString: White Pieces
   m_Icon: {fileID: 0}

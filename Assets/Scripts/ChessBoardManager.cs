@@ -32,12 +32,12 @@ public class ChessBoardManager : MonoBehaviour{
         Attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
         SelectedPieceAttacks = null;
         PlacePieces();
-        ManagePieceColliders();
     }
 
     void Update(){
         if (Input.GetMouseButtonDown(0)){
-            HandleMoveInputs();
+            int move = HandleMoveInputs();
+            if (move != 0) MakeMove(move);
         }
 
         if (Input.GetKeyDown(KeyCode.N)){
@@ -45,10 +45,22 @@ public class ChessBoardManager : MonoBehaviour{
         }
     }
 
+    // TODO: Fix raycasting or find better way to get the piece that is being captured
+    private void MakeMove(int move){
+        int src = Move.GetSrcSquare(move), dest = Move.GetDestSquare(move);
+        Transform destSquare = transform.Find("Model " + dest);
+        if (Move.IsCapture(move)) {
+            RaycastHit hit;
+            if (Physics.Raycast(destSquare.position, Vector3.up, out hit, 10.0f, LayerMask.GetMask("White") | LayerMask.GetMask("Black"))){
+                Destroy(hit.collider);
+            } else throw new Exception("There is a error!");
+        }
+    }
+
     // Handles all the move inputs to get from actions on board to move ints
     private int HandleMoveInputs(){
         GameObject temp = GetSelectedPiece();
-        int srcSquare, destSquare = GetSelectedSquare();
+        int destSquare = GetSelectedSquare();
         // If there is a piece selected and its a new piece
         if (temp != null && temp != SelectedPiece){
             DeselectPiece();
@@ -61,12 +73,9 @@ public class ChessBoardManager : MonoBehaviour{
         // If there is a piece selected and its a square that was clicked
         else if (temp == null && SelectedPiece != null && destSquare != -1){
             int[] chosenMoves = MoveGeneration.SortMoves(SelectedPieceAttacks, Properties.dest, destSquare);
-            foreach (int move in chosenMoves){
-                if (move != 0)
-                    Move.PrintMove(move);
-            }
+            return chosenMoves[0];
         }
-        return -1;
+        return 0;
     }
 
     // Should be run the first time the board is created, adds all the pieces on the board
@@ -106,36 +115,21 @@ public class ChessBoardManager : MonoBehaviour{
         Vector3 screenPosition = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(screenPosition);
         RaycastHit hit;
-        Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("Default"));
-        Transform SelectedPiece;
-        if (hit.collider != null){
-            switch(Chessboard.PlayerTurn){
-                case Side.White: 
-                    if (hit.collider.tag == "White Pieces") 
-                        SelectedPiece = hit.transform;
-                    else return null;
-                    break;
-                case Side.Black: 
-                    if (hit.collider.tag == "Black Pieces") 
-                        SelectedPiece = hit.transform;
-                    else return null;
-                    break;
-                default: throw new Exception("Something went wrong!");
-            }
+        Transform piece;
+        int layer = Chessboard.PlayerTurn == Side.White ? LayerMask.GetMask("White") : LayerMask.GetMask("Black");
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, layer)){
+            piece = hit.transform;
         } else return null;
-        return SelectedPiece.parent.gameObject;
+        return piece.parent.gameObject;
     }
 
+    // Using a raycast, determined the square that was clicked on
     private int GetSelectedSquare(){
         Vector3 screenPosition = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(screenPosition);
         RaycastHit hit;
-        Physics.Raycast(ray, out hit);
-        if (hit.collider != null){
-            if (hit.collider.tag == "Board"){
-                return int.Parse(hit.collider.name.Split(" ")[1]);
-            }
-        }
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Board")))
+            return int.Parse(hit.collider.name.Split(" ")[1]);
         return -1;
     }
 
@@ -172,24 +166,5 @@ public class ChessBoardManager : MonoBehaviour{
             Destroy(SelectedPieceVisuals[i]);
         }
         SelectedPieceVisuals.Clear();
-    }
-
-    // Turns off the opposite team's mesh colliders
-    private void ManagePieceColliders(){
-        GameObject[] wArray, bArray;
-        wArray = GameObject.FindGameObjectsWithTag("White Pieces");
-        bArray = GameObject.FindGameObjectsWithTag("Black Pieces");
-        if (Chessboard.PlayerTurn == Side.White){
-            for (int i = 0; i < wArray.Length; i++)
-                wArray[i].layer = LayerMask.NameToLayer("Default");
-            for (int i = 0; i < bArray.Length; i++)
-                bArray[i].layer = LayerMask.NameToLayer("Ignore Raycast");
-        }
-        else {
-            for (int i = 0; i < wArray.Length; i++)
-                wArray[i].layer = LayerMask.NameToLayer("Ignore Raycast");
-            for (int i = 0; i < bArray.Length; i++)
-                bArray[i].layer = LayerMask.NameToLayer("Default");
-        }
     }
 }

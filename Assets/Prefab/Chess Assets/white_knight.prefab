@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4815258793056975368}
   - component: {fileID: 574962000508683763}
   - component: {fileID: 7363804274942954049}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Model 0
   m_TagString: White Pieces
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6865998088644444901}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: white_knight
   m_TagString: Untagged
   m_Icon: {fileID: 0}

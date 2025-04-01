@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4925233922824702238}
   - component: {fileID: 6177581005986018034}
   - component: {fileID: 5379066117357728906}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Model 0
   m_TagString: White Pieces
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5035500101771675495}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: white_bishop
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -96,4 +96,8 @@ public struct Board{
         // TODO: Full Move Counter
     }
 
+    public void MakeMove(int move){
+
+    }
+
 }
