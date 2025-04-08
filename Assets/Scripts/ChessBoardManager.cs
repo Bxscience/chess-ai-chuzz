@@ -27,7 +27,7 @@ public class ChessBoardManager : MonoBehaviour{
 
     void Start(){
         Pieces = new List<GameObject>();
-        Chessboard = new Board("r3k2r/8/8/8/8/8/8/8 b kq - 0 1");
+        Chessboard = new Board("");
         AttackTables.InitAttackTables();
         Attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
         SelectedPieceAttacks = null;
@@ -37,7 +37,12 @@ public class ChessBoardManager : MonoBehaviour{
     void Update(){
         if (Input.GetMouseButtonDown(0)){
             int move = HandleMoveInputs();
-            if (move != 0) MakeMove(move);
+            if (move != 0){
+                MakeMove(move);
+                Chessboard.MakeMove(move);
+                Attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
+                SelectedPieceAttacks = null;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.N)){
@@ -45,9 +50,8 @@ public class ChessBoardManager : MonoBehaviour{
         }
     }
 
-    // TODO: Fix raycasting or find better way to get the piece that is being captured
     private void MakeMove(int move){
-        int src = Move.GetSrcSquare(move), dest = Move.GetDestSquare(move);
+        int dest = Move.GetDestSquare(move);
         Vector3 offset;
         Transform destSquare = transform.Find("Tiles");
         destSquare = destSquare.Find("Model " + dest);

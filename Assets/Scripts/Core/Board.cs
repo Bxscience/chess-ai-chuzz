@@ -23,11 +23,57 @@ public struct Board{
         Enpassant = Square.noSq;
         Rights = 0;
         ParseFENString();
-        Occupancies[(int)Side.White] = Bitboards[(int)Piece.WPawn] | Bitboards[(int)Piece.WBishop] | Bitboards[(int)Piece.WKnight] | 
-                    Bitboards[(int)Piece.WRook] | Bitboards[(int)Piece.WQueen] | Bitboards[(int)Piece.WKing];
-        Occupancies[(int)Side.Black] = Bitboards[(int)Piece.BPawn] | Bitboards[(int)Piece.BBishop] | Bitboards[(int)Piece.BKnight] | 
-                    Bitboards[(int)Piece.BRook] | Bitboards[(int)Piece.BQueen] | Bitboards[(int)Piece.BKing];
-        Occupancies[(int)Side.Both] = Occupancies[(int)Side.White] | Occupancies[(int)Side.Black];
+        UpdateOccpancies();
+    }
+
+    // Updates bitboards, castling rights, occupancies, enpassant, playerturns
+    public void MakeMove(int move){
+        int src = Move.GetSrcSquare(move), dest = Move.GetDestSquare(move);
+        Piece piece = Move.GetPiece(move);
+        if (Move.IsCapture(move)){
+            if (Move.IsEnpassant(move))
+                Helper.PopBit(ref Bitboards[(int)GetPieceFromSq((int)Enpassant)], dest + (int)Enpassant);
+            else
+                Helper.PopBit(ref Bitboards[(int)GetPieceFromSq(dest)], dest);
+        } else if (Move.IsPush(move)){
+            int enpassantOffset = PlayerTurn == Side.White ? -8 : 8;
+            Enpassant = (Square)(dest + enpassantOffset);
+        } else if (Move.IsCastle(move)){
+            if (PlayerTurn == Side.White){
+                Rights ^= CastlingRights.wk;
+                Rights ^= CastlingRights.wq;   
+            } else if (PlayerTurn == Side.Black){
+                Rights ^= CastlingRights.bk;
+                Rights ^= CastlingRights.bq;
+            } else throw new Exception("How'd this happen");
+            switch(dest){
+                case (int)Square.g1:
+                    Helper.PopBit(ref Bitboards[(int)Piece.WRook], (int)Square.h1);
+                    Helper.SetBit(ref Bitboards[(int)Piece.WRook], (int)Square.f1);
+                    break;
+                case (int)Square.c1:
+                    Helper.PopBit(ref Bitboards[(int)Piece.WRook], (int)Square.a1);
+                    Helper.SetBit(ref Bitboards[(int)Piece.WRook], (int)Square.d1);
+                    break;
+                case (int)Square.g8:
+                    Helper.PopBit(ref Bitboards[(int)Piece.WRook], (int)Square.h8);
+                    Helper.SetBit(ref Bitboards[(int)Piece.WRook], (int)Square.f8);
+                    break;
+                case (int)Square.c8:
+                    Helper.PopBit(ref Bitboards[(int)Piece.WRook], (int)Square.a8);
+                    Helper.SetBit(ref Bitboards[(int)Piece.WRook], (int)Square.d8);
+                    break;
+                default: throw new Exception("Move Generation Error?");
+            }
+        }
+        
+        Helper.PopBit(ref Bitboards[(int)piece], src);
+        Helper.SetBit(ref Bitboards[(int)piece], dest);
+
+        if (!Move.IsPush(move)) Enpassant = Square.noSq;
+
+        UpdateOccpancies();
+        PlayerTurn = Helper.GetOpponent(PlayerTurn);
     }
 
     // Represents all values in FEN String as Piece Enums for easy transversal
@@ -96,8 +142,20 @@ public struct Board{
         // TODO: Full Move Counter
     }
 
-    public void MakeMove(int move){
-
+    // Updates occpancy boards when called
+    private void UpdateOccpancies(){
+        Occupancies[(int)Side.White] = Bitboards[(int)Piece.WPawn] | Bitboards[(int)Piece.WBishop] | Bitboards[(int)Piece.WKnight] | 
+                    Bitboards[(int)Piece.WRook] | Bitboards[(int)Piece.WQueen] | Bitboards[(int)Piece.WKing];
+        Occupancies[(int)Side.Black] = Bitboards[(int)Piece.BPawn] | Bitboards[(int)Piece.BBishop] | Bitboards[(int)Piece.BKnight] | 
+                    Bitboards[(int)Piece.BRook] | Bitboards[(int)Piece.BQueen] | Bitboards[(int)Piece.BKing];
+        Occupancies[(int)Side.Both] = Occupancies[(int)Side.White] | Occupancies[(int)Side.Black];
     }
 
+    private Piece GetPieceFromSq(int src){
+        for (int iterator = 0; iterator < BitboardCount; iterator++){
+            if (Helper.GetBit(Bitboards[iterator], src) == 1)
+                return (Piece)iterator;
+        }
+        throw new Exception("No piece found!");
+    }
 }
