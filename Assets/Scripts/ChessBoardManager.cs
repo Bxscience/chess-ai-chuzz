@@ -27,7 +27,7 @@ public class ChessBoardManager : MonoBehaviour{
 
     void Start(){
         Pieces = new List<GameObject>();
-        Chessboard = new Board("8/8/8/8/3Pp3/8/8/8 b - d3 0 1");
+        Chessboard = new Board("r3k2r/8/8/8/8/8/8/8 b kq - 0 1");
         AttackTables.InitAttackTables();
         Attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
         SelectedPieceAttacks = null;
@@ -51,7 +51,7 @@ public class ChessBoardManager : MonoBehaviour{
         Vector3 offset;
         Transform destSquare = transform.Find("Tiles");
         destSquare = destSquare.Find("Model " + dest);
-        if (Move.IsCapture(move)) {
+        if (Move.IsCapture(move)){
             RaycastHit hit;
             if (!Move.IsEnpassant(move)){
                 if (Physics.Raycast(destSquare.position + new Vector3(0.5f, 0f, 0.5f), Vector3.up, out hit, 10.0f, LayerMask.GetMask("White") | LayerMask.GetMask("Black")))
@@ -63,6 +63,32 @@ public class ChessBoardManager : MonoBehaviour{
                     Destroy(hit.collider.gameObject);
                 else throw new Exception("Enpassant Piece not on square!");
             }
+        } else if (Move.IsCastle(move)){
+            Square rookSq;
+            RaycastHit hit;
+            // Offset depends on rook in the a1, h1, a8, h8
+            switch (dest){
+                case (int)Square.g1:
+                    offset = new Vector3(1.5f, 0f, 0.5f);
+                    rookSq = Square.f1;
+                    break;
+                case (int)Square.c1:
+                    offset = new Vector3(-1.5f, 0f, 0.5f);
+                    rookSq = Square.d1;
+                    break;
+                case (int)Square.g8:
+                    offset = new Vector3(1.5f, 0f, 0.5f);
+                    rookSq = Square.f8;
+                    break;
+                case (int)Square.c8:
+                    offset = new Vector3(-1.5f, 0f, 0.5f);
+                    rookSq = Square.d8;
+                    break;
+                default: throw new Exception("I dunno how this error happened ngl");
+            }
+            if (Physics.Raycast(destSquare.position + offset, Vector3.up, out hit, 10.0f, LayerMask.GetMask("White") | LayerMask.GetMask("Black"))){
+                hit.collider.transform.parent.transform.localPosition = IndexToCoord((int)rookSq);
+            } else throw new Exception("Castling Rook not found!");
         }
         SelectedPiece.transform.localPosition = IndexToCoord(dest) + new Vector3(0f, 0.2f, 0f);
         DeselectPiece();

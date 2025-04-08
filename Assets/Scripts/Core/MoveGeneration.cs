@@ -477,7 +477,7 @@ public struct MoveGeneration{
                 relevantRank &= _SecondRank;
                 castleMask = 0x7000000000000000;
                 irrelevantSq = 0x4000000000000000;
-                if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.White] & castleMask ^ irrelevantSq) == 0)
+                if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.Black] & (castleMask ^ irrelevantSq)) == 0)
                     return Move.EncodeMove((int)Square.e8, (int)Square.c8, Piece.BKing, Piece.noPiece, false, false, false, true);
                 break;
             default: throw new System.Exception("Invalid Castling Flag!");
