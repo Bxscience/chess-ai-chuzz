@@ -10,6 +10,7 @@
 when move == 0, the move is null
 */
 using System;
+using System.Diagnostics;
 
 public struct Move{
     // Converts moves on the board to binary for easier handling
@@ -112,6 +113,7 @@ public struct MoveGeneration{
         int moveIndex = 0;
         if (IsInCheck(board, side)){
             //TODO: generate moves when under check
+            UnityEngine.Debug.Log("Is In Check!");
             return moveList;
         }
         int offset = side == Side.Black ? 6 : 0;
@@ -376,10 +378,10 @@ public struct MoveGeneration{
 
     // Checks whether the given side is in check
     public static bool IsInCheck(Board board, Side side){
-        ulong kingBitboard = board.Bitboards[(int)(side == Side.Black ? Piece.BKing : Piece.WKing)];
+        ulong kingBitboard = board.Bitboards[(int)(side == Side.White ? Piece.WKing : Piece.BKing)];
         if (kingBitboard == 0) return false;
         int index = Helper.LSBIndex(kingBitboard);
-        return Helper.CheckBit(kingBitboard, AttackedSquares[(int)(side == Side.Black ? Side.White : Side.Black)], index);
+        return Helper.CheckBit(kingBitboard, AttackedSquares[(int)side], index);
     }
 
     // Sorts the moves in a array of moves, given the property to be searched and the value
@@ -468,13 +470,13 @@ public struct MoveGeneration{
                     return Move.EncodeMove((int)Square.e1, (int)Square.c1, Piece.WKing, Piece.noPiece, false, false, false, true);
                 break;
             case CastlingRights.bk:
-                relevantRank &= _SecondRank;
+                relevantRank &= _EighthRank;
                 castleMask = 0x600000000000000;
                 if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.Black] & castleMask) == 0)
                     return Move.EncodeMove((int)Square.e8, (int)Square.g8, Piece.BKing, Piece.noPiece, false, false, false, true);
                 break;
             case CastlingRights.bq:
-                relevantRank &= _SecondRank;
+                relevantRank &= _EighthRank;
                 castleMask = 0x7000000000000000;
                 irrelevantSq = 0x4000000000000000;
                 if ((relevantRank & castleMask) == 0 && (AttackedSquares[(int)Side.Black] & (castleMask ^ irrelevantSq)) == 0)

@@ -29,6 +29,7 @@ public class ChessBoardManager : MonoBehaviour{
         Pieces = new List<GameObject>();
         Chessboard = new Board("");
         AttackTables.InitAttackTables();
+        MoveGeneration.InitAttackMap(Chessboard);
         Attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
         SelectedPieceAttacks = null;
         PlacePieces();
@@ -40,7 +41,9 @@ public class ChessBoardManager : MonoBehaviour{
             if (move != 0){
                 MakeMove(move);
                 Chessboard.MakeMove(move);
+                MoveGeneration.InitAttackMap(Chessboard);
                 Attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
+                //Move.PrintMove(move);
                 SelectedPieceAttacks = null;
             }
         }
@@ -112,8 +115,13 @@ public class ChessBoardManager : MonoBehaviour{
         // If there is a piece selected and its the same piece
         else if (temp != null && temp == SelectedPiece) DeselectPiece();
         // If there is a piece selected and its a square that was clicked
-        else if (temp == null && SelectedPiece != null && destSquare != -1){
+        else if (temp == null && SelectedPiece != null && destSquare != (int)Square.noSq){
             int[] chosenMoves = MoveGeneration.SortMoves(SelectedPieceAttacks, Properties.dest, destSquare);
+            //if (Move.GetPiece(chosenMoves[0]) == Piece.WPawn || Move.GetDestSquare(chosenMoves[0]) >= (int)Square.h8){
+//
+            //} else if (Move.GetPiece(chosenMoves[0]) == Piece.BPawn || Move.GetDestSquare(chosenMoves[0]) <= (int)Square.a1){
+            //    
+            //}
             return chosenMoves[0];
         }
         return 0;
@@ -171,7 +179,7 @@ public class ChessBoardManager : MonoBehaviour{
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Board")))
             return int.Parse(hit.collider.name.Split(" ")[1]);
-        return -1;
+        return (int)Square.noSq;
     }
 
     // Gives the square to coordinate in world 

@@ -26,18 +26,21 @@ public struct Board{
         UpdateOccpancies();
     }
 
+    // TODO: Need to check castling rights even when not castling (conditions need to be met)
+    // TODO: 
     // Updates bitboards, castling rights, occupancies, enpassant, playerturns
     public void MakeMove(int move){
         int src = Move.GetSrcSquare(move), dest = Move.GetDestSquare(move);
+        int enpassantOffset = PlayerTurn == Side.White ? 8 : -8;
         Piece piece = Move.GetPiece(move);
         if (Move.IsCapture(move)){
             if (Move.IsEnpassant(move))
-                Helper.PopBit(ref Bitboards[(int)GetPieceFromSq((int)Enpassant)], dest + (int)Enpassant);
+                Helper.PopBit(ref Bitboards[(int)GetPieceFromSq((int)Enpassant - enpassantOffset)], dest + (int)Enpassant);
             else
                 Helper.PopBit(ref Bitboards[(int)GetPieceFromSq(dest)], dest);
         } else if (Move.IsPush(move)){
-            int enpassantOffset = PlayerTurn == Side.White ? -8 : 8;
-            Enpassant = (Square)(dest + enpassantOffset);
+            Enpassant = (Square)(dest - enpassantOffset);
+            UnityEngine.Debug.Log(Enpassant);
         } else if (Move.IsCastle(move)){
             if (PlayerTurn == Side.White){
                 Rights ^= CastlingRights.wk;
@@ -56,12 +59,12 @@ public struct Board{
                     Helper.SetBit(ref Bitboards[(int)Piece.WRook], (int)Square.d1);
                     break;
                 case (int)Square.g8:
-                    Helper.PopBit(ref Bitboards[(int)Piece.WRook], (int)Square.h8);
-                    Helper.SetBit(ref Bitboards[(int)Piece.WRook], (int)Square.f8);
+                    Helper.PopBit(ref Bitboards[(int)Piece.BRook], (int)Square.h8);
+                    Helper.SetBit(ref Bitboards[(int)Piece.BRook], (int)Square.f8);
                     break;
                 case (int)Square.c8:
-                    Helper.PopBit(ref Bitboards[(int)Piece.WRook], (int)Square.a8);
-                    Helper.SetBit(ref Bitboards[(int)Piece.WRook], (int)Square.d8);
+                    Helper.PopBit(ref Bitboards[(int)Piece.BRook], (int)Square.a8);
+                    Helper.SetBit(ref Bitboards[(int)Piece.BRook], (int)Square.d8);
                     break;
                 default: throw new Exception("Move Generation Error?");
             }
@@ -151,11 +154,13 @@ public struct Board{
         Occupancies[(int)Side.Both] = Occupancies[(int)Side.White] | Occupancies[(int)Side.Black];
     }
 
+    // Given a square, finds the piece on that square
     private Piece GetPieceFromSq(int src){
         for (int iterator = 0; iterator < BitboardCount; iterator++){
             if (Helper.GetBit(Bitboards[iterator], src) == 1)
                 return (Piece)iterator;
-        }
+        }   
+        UnityEngine.Debug.Log((Square)src);
         throw new Exception("No piece found!");
     }
 }
