@@ -27,7 +27,7 @@ public class ChessBoardManager : MonoBehaviour{
 
     void Start(){
         Pieces = new List<GameObject>();
-        Chessboard = new Board("");
+        Chessboard = new Board("r7/1P6/8/8/8/8/8/8 w - - 0 1");
         AttackTables.InitAttackTables();
         MoveGeneration.InitAttackMap(Chessboard);
         Attacks = MoveGeneration.InitMoves(Chessboard, Chessboard.PlayerTurn);
@@ -117,11 +117,15 @@ public class ChessBoardManager : MonoBehaviour{
         // If there is a piece selected and its a square that was clicked
         else if (temp == null && SelectedPiece != null && destSquare != (int)Square.noSq){
             int[] chosenMoves = MoveGeneration.SortMoves(SelectedPieceAttacks, Properties.dest, destSquare);
-            //if (Move.GetPiece(chosenMoves[0]) == Piece.WPawn || Move.GetDestSquare(chosenMoves[0]) >= (int)Square.h8){
-//
-            //} else if (Move.GetPiece(chosenMoves[0]) == Piece.BPawn || Move.GetDestSquare(chosenMoves[0]) <= (int)Square.a1){
-            //    
-            //}
+            //Move.PrintMove(chosenMoves[0]);
+            //Debug.Log(Move.GetPiece(chosenMoves[0]));
+            //Debug.Log(Move.GetDestSquare(chosenMoves[0]) >= (int)Square.h8);
+            IEnumerator<Piece> enumerator = HandlePromotion(Side.White);
+            if ((Move.GetPiece(chosenMoves[0]) == Piece.WPawn) && (Move.GetDestSquare(chosenMoves[0]) >= (int)Square.h8)){
+                Debug.Log(StartCoroutine(enumerator));
+            } else if (Move.GetPiece(chosenMoves[0]) == Piece.BPawn && Move.GetDestSquare(chosenMoves[0]) <= (int)Square.a1){
+                HandlePromotion(Side.Black);
+            }
             return chosenMoves[0];
         }
         return 0;
@@ -215,5 +219,20 @@ public class ChessBoardManager : MonoBehaviour{
             Destroy(SelectedPieceVisuals[i]);
         }
         SelectedPieceVisuals.Clear();
+    }
+
+    private IEnumerator<Piece> HandlePromotion(Side side){
+        Piece piece = Piece.noPiece;
+        while(piece == Piece.noPiece){
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+                piece = (side == Side.White) ? Piece.WQueen : Piece.BQueen;
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+                piece = (side == Side.White) ? Piece.WRook : Piece.BRook;
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+                piece = (side == Side.White) ? Piece.WBishop : Piece.BBishop;
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+                piece = (side == Side.White) ? Piece.WKnight : Piece.BKnight;
+        }
+        yield return piece;
     }
 }

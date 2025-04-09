@@ -38,10 +38,9 @@ public struct Board{
                 Helper.PopBit(ref Bitboards[(int)GetPieceFromSq((int)Enpassant - enpassantOffset)], dest + (int)Enpassant);
             else
                 Helper.PopBit(ref Bitboards[(int)GetPieceFromSq(dest)], dest);
-        } else if (Move.IsPush(move)){
+        } else if (Move.IsPush(move))
             Enpassant = (Square)(dest - enpassantOffset);
-            UnityEngine.Debug.Log(Enpassant);
-        } else if (Move.IsCastle(move)){
+        else if (Move.IsCastle(move)){
             if (PlayerTurn == Side.White){
                 Rights ^= CastlingRights.wk;
                 Rights ^= CastlingRights.wq;   

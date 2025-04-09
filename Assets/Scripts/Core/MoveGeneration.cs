@@ -9,9 +9,6 @@
 1000 0000 0000 0000 0000 0000       castling flag (1 bit)                   0x800000
 when move == 0, the move is null
 */
-using System;
-using System.Diagnostics;
-
 public struct Move{
     // Converts moves on the board to binary for easier handling
     public static int EncodeMove(int src, int dest, Piece piece, Piece promotedPiece, bool capture, bool doublePush, bool enpassant, bool castling){
