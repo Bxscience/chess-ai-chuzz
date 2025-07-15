@@ -1,15 +1,31 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChessBoardManager : MonoBehaviour{
-
+public class ChessBoardManager : MonoBehaviour
+{
     [SerializeField]
-    private GameObject PieceParent, WPawn, WKnight, WBishop, WRook, WQueen, WKing, BPawn, BKnight, BBishop, BRook, BQueen, BKing, SelectedSquareIndicator, PossibleMovesIndicator, AttackedMovesIndicator;
-    
+    private GameObject PieceParent,
+        WPawn,
+        WKnight,
+        WBishop,
+        WRook,
+        WQueen,
+        WKing,
+        BPawn,
+        BKnight,
+        BBishop,
+        BRook,
+        BQueen,
+        BKing,
+        SelectedSquareIndicator,
+        PossibleMovesIndicator,
+        AttackedMovesIndicator;
+
     [HideInInspector]
     private List<GameObject> Pieces;
-    
+
     [HideInInspector]
     public Board Chessboard;
 
@@ -22,10 +38,13 @@ public class ChessBoardManager : MonoBehaviour{
 
     // All moves in the position, Attacks for the currently selected piece
     [HideInInspector]
-    public int[] Attacks, SelectedPieceAttacks;
+    public int[] Attacks,
+        SelectedPieceAttacks;
+
     // Empty Board: 8/8/8/8/8/8/8/8 w ---- - 0 1
 
-    void Start(){
+    void Start()
+    {
         Pieces = new List<GameObject>();
         Chessboard = new Board("r7/1P6/8/8/8/8/8/8 w - - 0 1");
         AttackTables.InitAttackTables();
@@ -35,10 +54,13 @@ public class ChessBoardManager : MonoBehaviour{
         PlacePieces();
     }
 
-    void Update(){
-        if (Input.GetMouseButtonDown(0)){
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
             int move = HandleMoveInputs();
-            if (move != 0){
+            if (move != 0)
+            {
                 MakeMove(move);
                 Chessboard.MakeMove(move);
                 MoveGeneration.InitAttackMap(Chessboard);
@@ -48,33 +70,63 @@ public class ChessBoardManager : MonoBehaviour{
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.N)){
+        if (Input.GetKeyDown(KeyCode.N))
+        {
             Chessboard.PlayerTurn = Helper.GetOpponent(Chessboard.PlayerTurn);
         }
     }
 
-    private void MakeMove(int move){
+    private void MakeMove(int move)
+    {
         int dest = Move.GetDestSquare(move);
         Vector3 offset;
         Transform destSquare = transform.Find("Tiles");
         destSquare = destSquare.Find("Model " + dest);
-        if (Move.IsCapture(move)){
+        if (Move.IsCapture(move))
+        {
             RaycastHit hit;
-            if (!Move.IsEnpassant(move)){
-                if (Physics.Raycast(destSquare.position + new Vector3(0.5f, 0f, 0.5f), Vector3.up, out hit, 10.0f, LayerMask.GetMask("White") | LayerMask.GetMask("Black")))
+            if (!Move.IsEnpassant(move))
+            {
+                if (
+                    Physics.Raycast(
+                        destSquare.position + new Vector3(0.5f, 0f, 0.5f),
+                        Vector3.up,
+                        out hit,
+                        10.0f,
+                        LayerMask.GetMask("White") | LayerMask.GetMask("Black")
+                    )
+                )
                     Destroy(hit.collider.gameObject);
-                 else throw new Exception("Capture Piece not on square!");
-            } else {
-                offset = Chessboard.PlayerTurn == Side.White ? new Vector3(0.5f, 0f, -0.5f) : new Vector3(0.5f, 0f, 1.5f);
-                if (Physics.Raycast(destSquare.position + offset, Vector3.up, out hit, 10.0f, LayerMask.GetMask("White") | LayerMask.GetMask("Black")))
-                    Destroy(hit.collider.gameObject);
-                else throw new Exception("Enpassant Piece not on square!");
+                else
+                    throw new Exception("Capture Piece not on square!");
             }
-        } else if (Move.IsCastle(move)){
+            else
+            {
+                offset =
+                    Chessboard.PlayerTurn == Side.White
+                        ? new Vector3(0.5f, 0f, -0.5f)
+                        : new Vector3(0.5f, 0f, 1.5f);
+                if (
+                    Physics.Raycast(
+                        destSquare.position + offset,
+                        Vector3.up,
+                        out hit,
+                        10.0f,
+                        LayerMask.GetMask("White") | LayerMask.GetMask("Black")
+                    )
+                )
+                    Destroy(hit.collider.gameObject);
+                else
+                    throw new Exception("Enpassant Piece not on square!");
+            }
+        }
+        else if (Move.IsCastle(move))
+        {
             Square rookSq;
             RaycastHit hit;
             // Offset depends on rook in the a1, h1, a8, h8
-            switch (dest){
+            switch (dest)
+            {
                 case (int)Square.g1:
                     offset = new Vector3(1.5f, 0f, 0.5f);
                     rookSq = Square.f1;
@@ -91,40 +143,73 @@ public class ChessBoardManager : MonoBehaviour{
                     offset = new Vector3(-1.5f, 0f, 0.5f);
                     rookSq = Square.d8;
                     break;
-                default: throw new Exception("I dunno how this error happened ngl");
+                default:
+                    throw new Exception("I dunno how this error happened ngl");
             }
-            if (Physics.Raycast(destSquare.position + offset, Vector3.up, out hit, 10.0f, LayerMask.GetMask("White") | LayerMask.GetMask("Black"))){
+            if (
+                Physics.Raycast(
+                    destSquare.position + offset,
+                    Vector3.up,
+                    out hit,
+                    10.0f,
+                    LayerMask.GetMask("White") | LayerMask.GetMask("Black")
+                )
+            )
+            {
                 hit.collider.transform.parent.transform.localPosition = IndexToCoord((int)rookSq);
-            } else throw new Exception("Castling Rook not found!");
+            }
+            else
+                throw new Exception("Castling Rook not found!");
         }
         SelectedPiece.transform.localPosition = IndexToCoord(dest) + new Vector3(0f, 0.2f, 0f);
         DeselectPiece();
     }
 
     // Handles all the move inputs to get from actions on board to move ints
-    private int HandleMoveInputs(){
+    private int HandleMoveInputs()
+    {
         GameObject temp = GetSelectedPiece();
         int destSquare = GetSelectedSquare();
         // If there is a piece selected and its a new piece
-        if (temp != null && temp != SelectedPiece){
+        if (temp != null && temp != SelectedPiece)
+        {
             DeselectPiece();
             SelectedPiece = temp;
-            SelectedPieceAttacks = MoveGeneration.SortMoves(Attacks, Properties.src, CoordToIndex(SelectedPiece.transform));
+            SelectedPieceAttacks = MoveGeneration.SortMoves(
+                Attacks,
+                Properties.src,
+                CoordToIndex(SelectedPiece.transform)
+            );
             VisualizeMoves(SelectedPieceAttacks, SelectedPiece);
-        } 
+        }
         // If there is a piece selected and its the same piece
-        else if (temp != null && temp == SelectedPiece) DeselectPiece();
+        else if (temp != null && temp == SelectedPiece)
+            DeselectPiece();
         // If there is a piece selected and its a square that was clicked
-        else if (temp == null && SelectedPiece != null && destSquare != (int)Square.noSq){
-            int[] chosenMoves = MoveGeneration.SortMoves(SelectedPieceAttacks, Properties.dest, destSquare);
+        else if (temp == null && SelectedPiece != null && destSquare != (int)Square.noSq)
+        {
+            int[] chosenMoves = MoveGeneration.SortMoves(
+                SelectedPieceAttacks,
+                Properties.dest,
+                destSquare
+            );
             //Move.PrintMove(chosenMoves[0]);
             //Debug.Log(Move.GetPiece(chosenMoves[0]));
             //Debug.Log(Move.GetDestSquare(chosenMoves[0]) >= (int)Square.h8);
-            IEnumerator<Piece> enumerator = HandlePromotion(Side.White);
-            if ((Move.GetPiece(chosenMoves[0]) == Piece.WPawn) && (Move.GetDestSquare(chosenMoves[0]) >= (int)Square.h8)){
-                Debug.Log(StartCoroutine(enumerator));
-            } else if (Move.GetPiece(chosenMoves[0]) == Piece.BPawn && Move.GetDestSquare(chosenMoves[0]) <= (int)Square.a1){
-                HandlePromotion(Side.Black);
+            IEnumerator enumerator = HandlePromotion(Chessboard.PlayerTurn);
+            if (
+                (Move.GetPiece(chosenMoves[0]) == Piece.WPawn)
+                && (Move.GetDestSquare(chosenMoves[0]) >= (int)Square.h8)
+            )
+            {
+                StartCoroutine(enumerator);
+            }
+            else if (
+                Move.GetPiece(chosenMoves[0]) == Piece.BPawn
+                && Move.GetDestSquare(chosenMoves[0]) <= (int)Square.a1
+            )
+            {
+                StartCoroutine(enumerator);
             }
             return chosenMoves[0];
         }
@@ -132,29 +217,58 @@ public class ChessBoardManager : MonoBehaviour{
     }
 
     // Should be run the first time the board is created, adds all the pieces on the board
-    private void PlacePieces(){
-        for (int pieces = 0; pieces < Board.BitboardCount; pieces++){
+    private void PlacePieces()
+    {
+        for (int pieces = 0; pieces < Board.BitboardCount; pieces++)
+        {
             ulong pieceBitboard = Chessboard.Bitboards[pieces];
             int count = Helper.CountBit(pieceBitboard);
-            for (int iterator = 0; iterator < count; iterator++){
+            for (int iterator = 0; iterator < count; iterator++)
+            {
                 GameObject pieceObject;
                 int index = Helper.LSBIndex(pieceBitboard);
                 Helper.PopBit(ref pieceBitboard, index);
                 Vector3 position = IndexToCoord(index);
-                switch((Piece)pieces){
-                    case Piece.WPawn: pieceObject = WPawn; break;
-                    case Piece.WKnight: pieceObject = WKnight; break;
-                    case Piece.WBishop: pieceObject = WBishop; break;
-                    case Piece.WRook: pieceObject = WRook; break;
-                    case Piece.WQueen: pieceObject = WQueen; break;
-                    case Piece.WKing: pieceObject = WKing; break;
-                    case Piece.BPawn: pieceObject = BPawn; break;
-                    case Piece.BKnight: pieceObject = BKnight; break;
-                    case Piece.BBishop: pieceObject = BBishop; break;
-                    case Piece.BRook: pieceObject = BRook; break;
-                    case Piece.BQueen: pieceObject = BQueen; break;
-                    case Piece.BKing: pieceObject = BKing; break;
-                    default: throw new System.Exception("Invalid Piece!");
+                switch ((Piece)pieces)
+                {
+                    case Piece.WPawn:
+                        pieceObject = WPawn;
+                        break;
+                    case Piece.WKnight:
+                        pieceObject = WKnight;
+                        break;
+                    case Piece.WBishop:
+                        pieceObject = WBishop;
+                        break;
+                    case Piece.WRook:
+                        pieceObject = WRook;
+                        break;
+                    case Piece.WQueen:
+                        pieceObject = WQueen;
+                        break;
+                    case Piece.WKing:
+                        pieceObject = WKing;
+                        break;
+                    case Piece.BPawn:
+                        pieceObject = BPawn;
+                        break;
+                    case Piece.BKnight:
+                        pieceObject = BKnight;
+                        break;
+                    case Piece.BBishop:
+                        pieceObject = BBishop;
+                        break;
+                    case Piece.BRook:
+                        pieceObject = BRook;
+                        break;
+                    case Piece.BQueen:
+                        pieceObject = BQueen;
+                        break;
+                    case Piece.BKing:
+                        pieceObject = BKing;
+                        break;
+                    default:
+                        throw new System.Exception("Invalid Piece!");
                 }
                 GameObject piece = Instantiate(pieceObject, PieceParent.transform, false);
                 piece.transform.localPosition = position;
@@ -164,20 +278,28 @@ public class ChessBoardManager : MonoBehaviour{
     }
 
     // Raycasts the mouse position on the screen to the board. Returns the piece that the ray hits.
-    private GameObject GetSelectedPiece(){
+    private GameObject GetSelectedPiece()
+    {
         Vector3 screenPosition = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(screenPosition);
         RaycastHit hit;
         Transform piece;
-        int layer = Chessboard.PlayerTurn == Side.White ? LayerMask.GetMask("White") : LayerMask.GetMask("Black");
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, layer)){
+        int layer =
+            Chessboard.PlayerTurn == Side.White
+                ? LayerMask.GetMask("White")
+                : LayerMask.GetMask("Black");
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, layer))
+        {
             piece = hit.transform;
-        } else return null;
+        }
+        else
+            return null;
         return piece.parent.gameObject;
     }
 
     // Using a raycast, determined the square that was clicked on
-    private int GetSelectedSquare(){
+    private int GetSelectedSquare()
+    {
         Vector3 screenPosition = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(screenPosition);
         RaycastHit hit;
@@ -186,18 +308,24 @@ public class ChessBoardManager : MonoBehaviour{
         return (int)Square.noSq;
     }
 
-    // Gives the square to coordinate in world 
+    // Gives the square to coordinate in world
     private Vector3 IndexToCoord(int index) => new Vector3(-1 * index % 8, 0.3f, index / 8);
 
     // Gives the coordinate to square index
-    private int CoordToIndex(Transform position) => Math.Abs((int)position.localPosition.x) + Math.Abs((int)position.localPosition.z) * 8;
+    private int CoordToIndex(Transform position) =>
+        Math.Abs((int)position.localPosition.x) + Math.Abs((int)position.localPosition.z) * 8;
 
     // Visualizes the moves that a piece can do, as well as the current selected piece
-    private void VisualizeMoves(int[] moves, GameObject piece){
-        SelectedPieceVisuals.Add(Instantiate(SelectedSquareIndicator, piece.transform.position, Quaternion.identity));
+    private void VisualizeMoves(int[] moves, GameObject piece)
+    {
+        SelectedPieceVisuals.Add(
+            Instantiate(SelectedSquareIndicator, piece.transform.position, Quaternion.identity)
+        );
         piece.transform.localPosition += new Vector3(0f, 0.2f, 0f);
-        foreach (int move in moves){
-            if (move != 0){
+        foreach (int move in moves)
+        {
+            if (move != 0)
+            {
                 GameObject obj;
                 if (Move.IsCapture(move))
                     obj = Instantiate(AttackedMovesIndicator, PieceParent.transform, false);
@@ -210,20 +338,26 @@ public class ChessBoardManager : MonoBehaviour{
     }
 
     // Removes the visuals for a selected piece
-    private void DeselectPiece(){
-        if (SelectedPieceVisuals == null || SelectedPiece == null) return;
+    private void DeselectPiece()
+    {
+        if (SelectedPieceVisuals == null || SelectedPiece == null)
+            return;
         SelectedPiece.transform.localPosition -= new Vector3(0f, 0.2f, 0f);
 
         SelectedPiece = null;
-        for (int i = 0; i < SelectedPieceVisuals.Count; i++){
+        for (int i = 0; i < SelectedPieceVisuals.Count; i++)
+        {
             Destroy(SelectedPieceVisuals[i]);
         }
         SelectedPieceVisuals.Clear();
     }
 
-    private IEnumerator<Piece> HandlePromotion(Side side){
+    private IEnumerator HandlePromotion(Side side)
+    {
+        Debug.Log("Called");
         Piece piece = Piece.noPiece;
-        while(piece == Piece.noPiece){
+        while (piece == Piece.noPiece)
+        {
             if (Input.GetKeyDown(KeyCode.Alpha1))
                 piece = (side == Side.White) ? Piece.WQueen : Piece.BQueen;
             if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -232,7 +366,9 @@ public class ChessBoardManager : MonoBehaviour{
                 piece = (side == Side.White) ? Piece.WBishop : Piece.BBishop;
             if (Input.GetKeyDown(KeyCode.Alpha4))
                 piece = (side == Side.White) ? Piece.WKnight : Piece.BKnight;
+            yield return null;
         }
-        yield return piece;
+        Debug.Log(piece);
+        StopCoroutine("HandlePromotion");
     }
 }
